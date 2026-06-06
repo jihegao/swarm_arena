@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>竞争生存游戏 - 教学课件</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1117; color: #e6edf3; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+.slide-container { width: 100%; height: 100%; position: relative; }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 60px 100px; overflow-y: auto; }
+.slide.active { display: flex; }
+
+h1 { font-size: 3.2em; margin-bottom: 20px; line-height: 1.2; }
+h2 { font-size: 2.2em; margin-bottom: 30px; color: #58a6ff; border-bottom: 2px solid #21262d; padding-bottom: 12px; }
+h3 { font-size: 1.4em; margin: 20px 0 10px; color: #79c0ff; }
+p, li { font-size: 1.25em; line-height: 1.7; color: #c9d1d9; }
+ul, ol { margin: 12px 0 12px 28px; }
+li { margin-bottom: 6px; }
+
+.subtitle { font-size: 1.5em; color: #8b949e; margin-bottom: 40px; }
+.hero-icon { font-size: 5em; margin-bottom: 20px; }
+.highlight { color: #f0883e; font-weight: bold; }
+.code-inline { background: #161b22; padding: 2px 8px; border-radius: 4px; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.85em; color: #79c0ff; }
+
+pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 14px 0; overflow-x: auto; }
+pre code { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82em; line-height: 1.6; }
+.kw { color: #ff7b72; }
+.fn { color: #d2a8ff; }
+.str { color: #a5d6ff; }
+.cm { color: #8b949e; }
+.num { color: #79c0ff; }
+.tp { color: #ffa657; }
+.var { color: #e6edf3; }
+.op { color: #ff7b72; }
+
+table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95em; }
+th { background: #161b22; color: #58a6ff; padding: 10px 16px; text-align: left; border: 1px solid #30363d; }
+td { padding: 9px 16px; border: 1px solid #21262d; color: #c9d1d9; }
+tr:nth-child(even) td { background: #0d1117; }
+tr:nth-child(odd) td { background: #161b22; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
+.card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; }
+.card-desc { font-size: 0.95em; color: #8b949e; line-height: 1.5; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+
+.tip-box { background: #1c2128; border-left: 4px solid #f0883e; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+.tip-box p { color: #e6edf3; font-size: 1.05em; }
+
+.screenshot-placeholder {
+  background: #161b22;
+  border: 2px dashed #30363d;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #484f58;
+  font-size: 0.95em;
+  position: relative;
+  overflow: hidden;
+}
+.screenshot-placeholder .screenshot-icon { font-size: 2em; margin-bottom: 8px; }
+.screenshot-placeholder .screenshot-label { font-size: 0.9em; color: #8b949e; }
+.screenshot-placeholder img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  background: #58a6ff;
+  color: #0d1117;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.step-row { display: flex; align-items: center; margin-bottom: 10px; }
+.step-row p { margin: 0; font-size: 1.1em; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+.nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 100; }
+.nav button { background: #21262d; border: 1px solid #30363d; color: #e6edf3; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2em; cursor: pointer; transition: all 0.2s; }
+.nav button:hover { background: #30363d; }
+.page-num { color: #8b949e; font-size: 0.95em; min-width: 80px; text-align: center; }
+
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #58a6ff, #bc8cff); transition: width 0.3s; z-index: 100; }
+
+@media (max-width: 900px) {
+  .slide { padding: 30px 24px; }
+  h1 { font-size: 2.2em; }
+  h2 { font-size: 1.6em; }
+  p, li { font-size: 1em; }
+  .two-col { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<div class="slide-container" id="slides">
+
+<!-- Slide 1: Cover -->
+<div class="slide active" data-index="0">
+  <div class="hero-icon">&#x1F3AE;</div>
+  <h1>竞争生存游戏</h1>
+  <p class="subtitle">Competitive Survival — 编写 AI，让你的物种统治世界</p>
+  <p style="font-size:1.1em; color:#8b949e; max-width:700px;">
+    在 2D 世界中，你设计的生物将与其他生物竞争：抢食物、吃对手、繁殖后代。<br>
+    <span class="highlight">5000 tick 后，存活数量最多的物种获胜。</span>
+  </p>
+  <div style="margin-top:40px; display:flex; gap:24px;">
+    <div class="card" style="text-align:center; min-width:120px;">
+      <div style="font-size:2em;">&#x1F40D;</div>
+      <div class="card-title" style="color:#ff7b72;">Hunter</div>
+    </div>
+    <div class="card" style="text-align:center; min-width:120px;">
+      <div style="font-size:2em;">&#x1F42C;</div>
+      <div class="card-title" style="color:#3fb950;">Grazer</div>
+    </div>
+    <div class="card" style="text-align:center; min-width:120px;">
+      <div style="font-size:2em;">&#x1F435;</div>
+      <div class="card-title" style="color:#58a6ff;">PackHunter</div>
+    </div>
+    <div class="card" style="text-align:center; min-width:120px;">
+      <div style="font-size:2em;">&#x1F409;</div>
+      <div class="card-title" style="color:#d29922;">Scavenger</div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: Game Goal -->
+<div class="slide" data-index="1">
+  <h2>&#x1F3AF; 游戏目标</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">&#x23F1; 时间限制</div>
+      <div class="card-desc">游戏在 <span class="highlight">5000 tick</span> 后结束（或只剩一种生物时提前结束）。</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F3C6; 胜利条件</div>
+      <div class="card-desc">存活数量最多的物种中，能量最高的个体获胜。</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F981; 核心玩法</div>
+      <div class="card-desc">抢食物 → 长大 → 吃掉比自己小的对手 → 繁殖后代 → 数量碾压。</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F4CA; 计分规则</div>
+      <div class="card-desc">吃掉对手 +对手max_energy | 吃食物 +amount | 繁殖 +100 | 最终获胜 +500</div>
+    </div>
+  </div>
+  <div class="tip-box">
+    <p><span class="highlight">关键思路</span>：这是一个滚雪球游戏。前期抢到食物 → 体型变大 → 能吃更多对手 → 获得更多能量 → 繁殖更多后代。起步很关键！</p>
+  </div>
+</div>
+
+<!-- Slide 3: Quick Start -->
+<div class="slide" data-index="2">
+  <h2>&#x1F680; 快速开始</h2>
+  <div class="two-col">
+    <div>
+      <h3>运行游戏</h3>
+      <pre><code><span class="kw">python</span> main.py</code></pre>
+      <h3>操作按键</h3>
+      <table>
+        <tr><th>按键</th><th>功能</th></tr>
+        <tr><td><span class="code-inline">SPACE</span></td><td>暂停 / 继续</td></tr>
+        <tr><td><span class="code-inline">R</span></td><td>重新开始</td></tr>
+        <tr><td><span class="code-inline">ESC</span></td><td>退出</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>创建你的生物</h3>
+      <p>在 <span class="code-inline">creatures/</span> 目录下新建 <span class="code-inline">.py</span> 文件，定义一个继承自 <span class="code-inline">Creature</span> 的类，实现 <span class="code-inline">decide()</span> 方法。重启游戏即可自动加入。</p>
+      <div class="tip-box" style="margin-top:20px;">
+        <p>每个合法的 Creature 子类会生成相同数量的初始实例。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: Step-by-step Guide -->
+<div class="slide" data-index="3">
+  <h2>&#x1F4CB; 操作指南 — 分步演示</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+    <div>
+      <div class="step-row"><span class="step-number">1</span><p>打开终端，进入项目目录</p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
+        <span class="screenshot-icon">&#x1F4BB;</span>
+        <span class="screenshot-label">截图：终端输入 cd 命令</span>
+        <img src="screenshots/step1_terminal.png" alt="step1" onerror="this.style.display='none'">
+      </div>
+
+      <div class="step-row"><span class="step-number">2</span><p>运行游戏 <span class="code-inline">python main.py</span></p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
+        <span class="screenshot-icon">&#x1F3AE;</span>
+        <span class="screenshot-label">截图：游戏启动画面</span>
+        <img src="screenshots/step2_run_game.png" alt="step2" onerror="this.style.display='none'">
+      </div>
+
+      <div class="step-row"><span class="step-number">3</span><p>在 <span class="code-inline">creatures/</span> 下新建 <span class="code-inline">.py</span> 文件</p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:0;">
+        <span class="screenshot-icon">&#x1F4DD;</span>
+        <span class="screenshot-label">截图：编辑器中创建新文件</span>
+        <img src="screenshots/step3_create_file.png" alt="step3" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div>
+      <div class="step-row"><span class="step-number">4</span><p>编写 Creature 类和 decide() 方法</p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
+        <span class="screenshot-icon">&#x270D;&#xFE0F;</span>
+        <span class="screenshot-label">截图：编辑器中编写代码</span>
+        <img src="screenshots/step4_write_code.png" alt="step4" onerror="this.style.display='none'">
+      </div>
+
+      <div class="step-row"><span class="step-number">5</span><p>重启游戏，观察你的生物表现</p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
+        <span class="screenshot-icon">&#x1F50D;</span>
+        <span class="screenshot-label">截图：游戏中看到你的生物</span>
+        <img src="screenshots/step5_observe.png" alt="step5" onerror="this.style.display='none'">
+      </div>
+
+      <div class="step-row"><span class="step-number">6</span><p>按 <span class="code-inline">SPACE</span> 暂停，调整策略后按 <span class="code-inline">R</span> 重来</p></div>
+      <div class="screenshot-placeholder" style="height:120px; margin-bottom:0;">
+        <span class="screenshot-icon">&#x1F504;</span>
+        <span class="screenshot-label">截图：调试与迭代过程</span>
+        <img src="screenshots/step6_iterate.png" alt="step6" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: Your Task -->
+<div class="slide" data-index="4">
+  <h2>&#x1F4DD; 你的任务</h2>
+  <p style="margin-bottom:20px;">只需要做两件事：<span class="highlight">创建类</span> 和 <span class="highlight">实现 decide()</span>。</p>
+  <h3>最小模板</h3>
+  <pre><code><span class="kw">from</span> <span class="tp">__future__</span> <span class="kw">import</span> <span class="tp">annotations</span>
+<span class="kw">import</span> <span class="tp">math</span>, <span class="tp">os</span>, <span class="tp">sys</span>
+<span class="var">sys</span>.<span class="fn">path</span>.<span class="fn">insert</span>(<span class="num">0</span>, <span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">abspath</span>(<span class="var">__file__</span>))))
+<span class="kw">from</span> <span class="tp">creature</span> <span class="kw">import</span> <span class="tp">Creature</span>, <span class="tp">Perception</span>, <span class="tp">Action</span>
+
+<span class="kw">class</span> <span class="tp">MyCreature</span>(<span class="tp">Creature</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>: <span class="tp">float</span>, <span class="var">y</span>: <span class="tp">float</span>):
+        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"MyCreature"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
+
+    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">perception</span>: <span class="tp">Perception</span>) -> <span class="tp">Action</span>:
+        <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">perception</span>.<span class="var">self_angle</span>, <span class="var">self</span>.<span class="var">max_speed</span>)</code></pre>
+  <div class="tip-box">
+    <p>这段代码创建了一个只会直线前进的橙色生物。你可以在此基础上逐步改进！</p>
+  </div>
+</div>
+
+<!-- Slide 6: Perception -->
+<div class="slide" data-index="5">
+  <h2>&#x1F441; Perception — 你能看到什么</h2>
+  <p style="margin-bottom:16px;">每一帧，游戏引擎调用 <span class="code-inline">decide(perception)</span>，传入感知信息：</p>
+  <table>
+    <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+    <tr><td><span class="code-inline">self_x / self_y</span></td><td>float</td><td>你的坐标</td></tr>
+    <tr><td><span class="code-inline">self_angle</span></td><td>float</td><td>你的朝向（弧度，0=右，pi/2=下）</td></tr>
+    <tr><td><span class="code-inline">self_size</span></td><td>float</td><td>你的体型大小（随能量动态变化）</td></tr>
+    <tr><td><span class="code-inline">self_energy</span></td><td>float</td><td>你的能量值</td></tr>
+    <tr><td><span class="code-inline">self_max_energy</span></td><td>float</td><td>你的初始能量值</td></tr>
+    <tr><td><span class="code-inline">world_width / height</span></td><td>int</td><td>世界尺寸</td></tr>
+    <tr><td><span class="code-inline">nearby_food</span></td><td>list[FoodSpot]</td><td>视野范围内的食物列表</td></tr>
+    <tr><td><span class="code-inline">nearby_creatures</span></td><td>list[CreatureSpot]</td><td>视野范围内的其他生物</td></tr>
+  </table>
+  <div class="two-col" style="margin-top:12px;">
+    <div class="card">
+      <div class="card-title">FoodSpot</div>
+      <div class="card-desc"><span class="code-inline">x, y</span> 坐标 | <span class="code-inline">amount</span> 能量值 | <span class="code-inline">size</span> 大小</div>
+    </div>
+    <div class="card">
+      <div class="card-title">CreatureSpot</div>
+      <div class="card-desc"><span class="code-inline">x, y</span> 坐标 | <span class="code-inline">creature_type</span> 类型名 | <span class="code-inline">size</span> 体型 | <span class="code-inline">energy_pct</span> 能量百分比</div>
+    </div>
+  </div>
+  <div class="tip-box">
+    <p>你只能看到 <span class="code-inline">vision_radius</span> 范围内的东西，范围外的世界不可见！</p>
+  </div>
+</div>
+
+<!-- Slide 7: Action -->
+<div class="slide" data-index="6">
+  <h2>&#x1F3AF; Action — 你要做什么</h2>
+  <p style="margin-bottom:16px;">每帧返回一个 <span class="code-inline">Action</span> 对象：</p>
+  <pre><code><span class="fn">Action</span>(
+    <span class="var">target_angle</span>,       <span class="cm"># float: 这一帧要朝向的角度（弧度）</span>
+    <span class="var">target_speed</span>,       <span class="cm"># float: 这一帧的移动速度（不超过 max_speed）</span>
+    <span class="var">attack_target_id</span>,   <span class="cm"># int | None: 要追击的生物 ID（仅标记意图）</span>
+    <span class="var">reproduce</span>,          <span class="cm"># bool: 是否繁殖（默认 False）</span>
+)</code></pre>
+  <div class="card-grid" style="margin-top:20px;">
+    <div class="card">
+      <div class="card-title">&#x1F3C3; 移动</div>
+      <div class="card-desc">每帧必须指定 <span class="code-inline">target_angle</span> 和 <span class="code-inline">target_speed</span>。设 0 表示停止。</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x2694;&#xFE0F; 攻击</div>
+      <div class="card-desc">碰到比自己<span class="highlight">小</span>的生物会自动吃掉，无需主动声明攻击！</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F476; 繁殖</div>
+      <div class="card-desc">设 <span class="code-inline">reproduce=True</span> 且满足条件时，附近生成同类型子代。</div>
+    </div>
+  </div>
+  <div class="tip-box">
+    <p>战斗规则很简单：<span class="highlight">大吃小</span>。没有攻击力和防御力。你只需要移动到比你小的生物旁边就行！</p>
+  </div>
+</div>
+
+<!-- Slide 8: Attributes -->
+<div class="slide" data-index="7">
+  <h2>&#x2699;&#xFE0F; 属性系统与点数分配</h2>
+  <div class="two-col">
+    <div>
+      <h3>可配置属性</h3>
+      <table>
+        <tr><th>属性</th><th>默认</th><th>最小</th><th>最大</th><th>说明</th></tr>
+        <tr><td>max_speed</td><td>1.0</td><td>0.5</td><td>4.0</td><td>最大移动速度</td></tr>
+        <tr><td>max_energy</td><td>100</td><td>30</td><td>200</td><td>初始能量值</td></tr>
+        <tr><td>vision_radius</td><td>20</td><td>50</td><td>300</td><td>视野半径</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>点数预算 = 1.5</h3>
+      <pre><code><span class="cm"># 归一化值 = (值 - 最小) / (最大 - 最小)</span>
+<span class="cm"># 总点数 = 各属性归一化值之和</span>
+<span class="cm"># 超过 1.5 则等比例缩小</span>
+
+<span class="cm"># 示例：Hunter 的分配</span>
+<span class="var">speed</span>  = (<span class="num">2.5</span> - <span class="num">0.5</span>) / (<span class="num">4.0</span> - <span class="num">0.5</span>) = <span class="num">0.57</span>
+<span class="var">energy</span> = (<span class="num">80</span>  - <span class="num">30</span>) / (<span class="num">200</span> - <span class="num">30</span>) = <span class="num">0.29</span>
+<span class="var">vision</span> = (<span class="num">200</span> - <span class="num">50</span>) / (<span class="num">300</span> - <span class="num">50</span>) = <span class="num">0.60</span>
+<span class="var">总计</span>   = <span class="num">1.46</span></code></pre>
+    </div>
+  </div>
+  <div class="tip-box">
+    <p><span class="highlight">速度最关键</span>：能吃到食物就能长大，长大就能吃别人，是滚雪球的核心！</p>
+  </div>
+</div>
+
+<!-- Slide 9: Eat Rules -->
+<div class="slide" data-index="8">
+  <h2>&#x1F356; 大吃小规则</h2>
+  <div class="two-col">
+    <div>
+      <h3>战斗规则</h3>
+      <ul>
+        <li>碰到比自己<span class="highlight">体型小</span>的生物，直接吃掉</li>
+        <li>获得对方<span class="highlight">全部剩余能量</span></li>
+        <li>碰撞范围：距离 &lt; (eater.size + target.size) &times; 0.6</li>
+        <li>吃掉后 10 帧冷却</li>
+      </ul>
+      <h3>体型公式</h3>
+      <pre><code><span class="var">size</span> = <span class="num">6</span> &times; <span class="fn">sqrt</span>(<span class="var">energy</span> / <span class="num">100</span>)</code></pre>
+    </div>
+    <div>
+      <h3>能量与体型对照</h3>
+      <table>
+        <tr><th>能量</th><th>体型</th></tr>
+        <tr><td>50</td><td>4.2</td></tr>
+        <tr><td>100</td><td>6.0</td></tr>
+        <tr><td>200</td><td>8.5</td></tr>
+        <tr><td>500</td><td>13.4</td></tr>
+        <tr><td>1000</td><td>19.0</td></tr>
+        <tr><td>5000</td><td>42.4</td></tr>
+      </table>
+      <div class="tip-box">
+        <p>体型越大碰撞范围也越大，更容易被更大的生物碰到！</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 10: Reproduction -->
+<div class="slide" data-index="9">
+  <h2>&#x1F476; 繁殖机制</h2>
+  <div class="two-col">
+    <div>
+      <h3>繁殖条件</h3>
+      <table>
+        <tr><th>条件</th><th>值</th></tr>
+        <tr><td>能量阈值</td><td>&ge; max_energy &times; 2.0</td></tr>
+        <tr><td>繁殖消耗</td><td>max_energy &times; 0.5</td></tr>
+        <tr><td>冷却时间</td><td>120 帧</td></tr>
+        <tr><td>子代位置</td><td>母体周围随机 20px</td></tr>
+        <tr><td>世界上限</td><td>600 生物</td></tr>
+      </table>
+      <h3>流程</h3>
+      <ol>
+        <li><span class="code-inline">reproduce=True</span></li>
+        <li>检查能量 &ge; max_energy &times; 2</li>
+        <li>检查冷却为 0</li>
+        <li>扣除能量，生成子代</li>
+        <li>进入 120 帧冷却，得 100 分</li>
+      </ol>
+    </div>
+    <div>
+      <h3>繁殖策略</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">&#x23F0; 早生策略</div>
+          <div class="card-desc">能量刚到阈值就生，子代小但数量多。</div>
+        </div>
+        <div class="card">
+          <div class="card-title">&#x1F4AA; 晚生策略</div>
+          <div class="card-desc">攒更多能量再生，子代更大更安全。</div>
+        </div>
+        <div class="card">
+          <div class="card-title">&#x1F52D; 时机选择</div>
+          <div class="card-desc">周围没有天敌时繁殖更安全。</div>
+        </div>
+      </div>
+      <div class="tip-box">
+        <p>判断是否可繁殖：<span class="code-inline">perception.self_energy >= perception.self_max_energy * 2.0</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 11: Energy -->
+<div class="slide" data-index="10">
+  <h2>&#x26A1; 能量系统</h2>
+  <p style="margin-bottom:16px;">能量是生存的核心。<span class="highlight">能量降到 0 你就死了。</span></p>
+  <div class="two-col">
+    <div>
+      <h3>能量消耗（每帧）</h3>
+      <table>
+        <tr><th>来源</th><th>公式</th></tr>
+        <tr><td>基础衰减</td><td>0.1 &times; (体型 / 6)</td></tr>
+        <tr><td>移动消耗</td><td>额外 0.08 &times; (速度/max_speed) &times; (体型/6)</td></tr>
+      </table>
+      <div class="tip-box">
+        <p>体型越大，能量消耗越高！没有食物来源时，适当"减肥"可能比维持巨大体型更持久。</p>
+      </div>
+    </div>
+    <div>
+      <h3>能量恢复</h3>
+      <table>
+        <tr><th>来源</th><th>效果</th></tr>
+        <tr><td>&#x1F35E; 吃食物</td><td>+ 食物的 amount（8~100）</td></tr>
+        <tr><td>&#x1F981; 吃掉对手</td><td>+ 对手全部剩余能量</td></tr>
+        <tr><td>&#x1F476; 繁殖</td><td>- max_energy &times; 0.5</td></tr>
+      </table>
+      <h3>吃食物条件</h3>
+      <p>你与食物的距离 &lt; 你的体型 + 3</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 12: Opponents -->
+<div class="slide" data-index="11">
+  <h2>&#x1F465; 内置对手分析</h2>
+  <div class="card-grid">
+    <div class="card" style="border-left:4px solid #ff7b72;">
+      <div class="card-title" style="color:#ff7b72;">&#x1F534; Hunter（猎人）</div>
+      <div class="card-desc">
+        速度 2.5 | 能量 80 | 视野 200<br>
+        追猎视野内最弱的生物，低能量时找食物。能量充足时繁殖。<br>
+        <span class="highlight">弱点</span>：初始能量低，前期容易被吃。
+      </div>
+    </div>
+    <div class="card" style="border-left:4px solid #3fb950;">
+      <div class="card-title" style="color:#3fb950;">&#x1F7E2; Grazer（食草者）</div>
+      <div class="card-desc">
+        速度 1.5 | 能量 100 | 视野 150<br>
+        以吃食物为主，敌人接近 35px 时逃跑。能量超 2.5 倍时繁殖。<br>
+        <span class="highlight">弱点</span>：速度最慢，容易被追上。
+      </div>
+    </div>
+    <div class="card" style="border-left:4px solid #58a6ff;">
+      <div class="card-title" style="color:#58a6ff;">&#x1F535; PackHunter（群猎者）</div>
+      <div class="card-desc">
+        速度 2.2 | 能量 80 | 视野 150<br>
+        寻找同伴，聚在一起时围猎。附近同类 &lt;5 且能量充足时繁殖。落单时逃跑。<br>
+        <span class="highlight">弱点</span>：初始能量低，容易被各个击破。
+      </div>
+    </div>
+    <div class="card" style="border-left:4px solid #d29922;">
+      <div class="card-title" style="color:#d29922;">&#x1F7E1; Scavenger（拾荒者）</div>
+      <div class="card-desc">
+        速度 3.5 | 能量 60 | 视野 160<br>
+        全场最快，抢到食物就跑。能量超 3 倍时繁殖。从不主动攻击。<br>
+        <span class="highlight">弱点</span>：初始能量最低，谁都能吃它。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 13: Strategy & Example -->
+<div class="slide" data-index="12">
+  <h2>&#x1F4A1; 策略提示与完整示例</h2>
+  <div class="card-grid" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">&#x2744;&#xFE0F; 滚雪球型</div><div class="card-desc">前期专注吃食物快速长大，体型大了吃别人。</div></div>
+    <div class="card"><div class="card-title">&#x1F4CA; 速繁殖型</div><div class="card-desc">尽快攒能量繁殖，靠数量优势取胜。</div></div>
+    <div class="card"><div class="card-title">&#x1F3AF; 猎人型</div><div class="card-desc">高速度+大视野，专门追杀比自己小的生物。</div></div>
+    <div class="card"><div class="card-title">&#x1F40D; 伏击型</div><div class="card-desc">躲在食物附近，等对手来吃时突然出手。</div></div>
+  </div>
+  <h3>常用代码片段</h3>
+  <div class="two-col">
+    <div>
+      <pre><code><span class="cm"># 朝向某点</span>
+<span class="var">angle</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">ty</span>-<span class="var">y</span>, <span class="var">tx</span>-<span class="var">x</span>)
+
+<span class="cm"># 两点距离</span>
+<span class="var">dist</span> = <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">tx</span>-<span class="var">x</span>, <span class="var">ty</span>-<span class="var">y</span>)
+
+<span class="cm"># 逃离敌人</span>
+<span class="var">flee</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">y</span>-<span class="var">ey</span>, <span class="var">x</span>-<span class="var">ex</span>)</code></pre>
+    </div>
+    <div>
+      <pre><code><span class="cm"># 找最近实体</span>
+<span class="var">nearest</span> = <span class="fn">min</span>(<span class="var">list</span>,
+  <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(
+    <span class="var">c</span>.<span class="var">x</span>-<span class="var">x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">y</span>))
+
+<span class="cm"># 随机漫步</span>
+<span class="var">angle</span> = <span class="var">angle</span> + <span class="fn">sin</span>(<span class="var">x</span>*<span class="num">0.01</span>)*<span class="num">0.3</span></code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 14: Full Example -->
+<div class="slide" data-index="13">
+  <h2>&#x1F4BB; 完整示例：Survivor</h2>
+  <pre><code><span class="kw">class</span> <span class="tp">Survivor</span>(<span class="tp">Creature</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>: <span class="tp">float</span>, <span class="var">y</span>: <span class="tp">float</span>):
+        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"Survivor"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
+        <span class="var">self</span>.<span class="var">max_speed</span> = <span class="num">2.2</span>
+        <span class="var">self</span>.<span class="var">max_energy</span> = <span class="num">100.0</span>
+        <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">160.0</span>
+
+    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>: <span class="tp">Perception</span>) -> <span class="tp">Action</span>:
+        <span class="cm"># 1. 能量充足时繁殖</span>
+        <span class="kw">if</span> <span class="var">p</span>.<span class="var">self_energy</span> >= <span class="var">p</span>.<span class="var">self_max_energy</span> * <span class="num">2.5</span>:
+            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>, <span class="num">0</span>, <span class="var">reproduce</span>=<span class="kw">True</span>)
+        <span class="cm"># 2. 追杀比自己小的对手</span>
+        <span class="var">smaller</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> < <span class="var">p</span>.<span class="var">self_size</span>]
+        <span class="kw">if</span> <span class="var">smaller</span>:
+            <span class="var">t</span> = <span class="fn">min</span>(<span class="var">smaller</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
+            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">t</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>, <span class="var">t</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>), <span class="var">self</span>.<span class="var">max_speed</span>)
+        <span class="cm"># 3. 远离比自己大的对手</span>
+        <span class="var">bigger</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> > <span class="var">p</span>.<span class="var">self_size</span>]
+        <span class="kw">if</span> <span class="var">bigger</span>:
+            <span class="var">b</span> = <span class="fn">min</span>(<span class="var">bigger</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
+            <span class="kw">if</span> <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">b</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">b</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>) < <span class="num">60</span>:
+                <span class="var">flee</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">p</span>.<span class="var">self_y</span>-<span class="var">b</span>.<span class="var">y</span>, <span class="var">p</span>.<span class="var">self_x</span>-<span class="var">b</span>.<span class="var">x</span>)
+                <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">flee</span>, <span class="var">self</span>.<span class="var">max_speed</span>)
+        <span class="cm"># 4. 找食物或随机漫步</span>
+        <span class="kw">if</span> <span class="var">p</span>.<span class="var">nearby_food</span>:
+            <span class="var">f</span> = <span class="fn">min</span>(<span class="var">p</span>.<span class="var">nearby_food</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">f</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">f</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">f</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
+            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">f</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>, <span class="var">f</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>), <span class="var">self</span>.<span class="var">max_speed</span>*<span class="num">0.7</span>)
+        <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>+<span class="var">math</span>.<span class="fn">sin</span>(<span class="var">p</span>.<span class="var">self_x</span>*<span class="num">0.015</span>)*<span class="num">0.2</span>, <span class="var">self</span>.<span class="var">max_speed</span>*<span class="num">0.4</span>)</code></pre>
+</div>
+
+<!-- Slide 15: Ending -->
+<div class="slide" data-index="14">
+  <div class="hero-icon">&#x1F3C6;</div>
+  <h1>祝你好运！</h1>
+  <p class="subtitle">让你的物种统治这个世界</p>
+  <div class="card-grid" style="max-width:700px; margin: 0 auto;">
+    <div class="card">
+      <div class="card-title">&#x1F680; 开始动手</div>
+      <div class="card-desc">在 <span class="code-inline">creatures/</span> 目录下创建你的 <span class="code-inline">.py</span> 文件</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F50D; 测试迭代</div>
+      <div class="card-desc">运行游戏观察表现，反复调整策略</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F9E0; 思考方向</div>
+      <div class="card-desc">速度 vs 能量 vs 视野，找到最佳平衡</div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#x1F91D; 公平竞争</div>
+      <div class="card-desc">所有生物共享相同规则，AI 决定胜负</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav">
+  <button id="prevBtn" onclick="go(-1)">&#x25C0;</button>
+  <span class="page-num" id="pageNum">1 / 15</span>
+  <button id="nextBtn" onclick="go(1)">&#x25B6;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+
+function show(n) {
+  slides[current].classList.remove('active');
+  current = ((n % total) + total) % total;
+  slides[current].classList.add('active');
+  document.getElementById('pageNum').textContent = (current + 1) + ' / ' + total;
+  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+}
+
+function go(dir) { show(current + dir); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { e.preventDefault(); show(0); }
+  if (e.key === 'End') { e.preventDefault(); show(total - 1); }
+});
+
+let touchStart = 0;
+document.addEventListener('touchstart', function(e) { touchStart = e.touches[0].clientX; });
+document.addEventListener('touchend', function(e) {
+  const diff = e.changedTouches[0].clientX - touchStart;
+  if (Math.abs(diff) > 50) go(diff > 0 ? -1 : 1);
+});
+
+show(0);
+</script>
+</body>
+</html>

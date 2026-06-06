@@ -1,0 +1,5 @@
+interface:
+  display_name: "Swarm Arena Experiments"
+  short_description: "Run GA, RL, and GEP creature training"
+  default_prompt: "Use $swarm-arena-experiments to run and validate the GA, RL, and GEP training experiments."
+

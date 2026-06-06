@@ -1,0 +1,13 @@
+{
+  "close_chase_distance": 35.12788082461121,
+  "danger_size_ratio": 0.9278225374537117,
+  "flee_size_multiplier": 9.59013982678586,
+  "food_speed_ratio": 0.8985035455461309,
+  "max_energy": 69.69837004994861,
+  "max_speed": 3.0156279548250335,
+  "prey_size_ratio": 0.7303982068133891,
+  "reproduce_ratio": 2.3915640017521573,
+  "threat_size_ratio": 1.2345325780761693,
+  "vision_radius": 193.42713538831924,
+  "wander_turn": 0.20595677229142445
+}
