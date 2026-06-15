@@ -26,7 +26,7 @@ python train.py --method ga --creature creatures/apex.py --generations 20
 python train.py --method rl --episodes 200 --output best_policy.json
 ```
 
-GA 输出 `best_params.json`，RL 输出 `best_policy.json`。RL 默认会用 pygame 可视化每个 episode；如果希望加快训练或后台运行，可加 `--no-visualize-episodes`。GEP 规则生成仍在设计文档阶段，当前 `train.py` 暂不支持 `--method gep`。
+GA 输出 `best_params.json`，RL 输出 `best_policy.json`。课堂约定中，GA/遗传算法与 RL/强化学习训练都默认以前台可视化方式启动：GA 先看基线模拟、前台显示每代进度、再看训练后结果；RL 默认会用 pygame 可视化每个 episode。如果希望加快训练或后台运行，RL 可加 `--no-visualize-episodes`，GA 可明确要求后台并行执行。GEP 规则生成仍在设计文档阶段，当前 `train.py` 暂不支持 `--method gep`。
 
 ### 操作
 

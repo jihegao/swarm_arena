@@ -85,19 +85,25 @@ Keep the local run visible to the student whenever the teaching goal is
 observation. Use a headless or background run only when the student explicitly
 asks for background execution, batch comparison, or non-visual evidence.
 
-For GA and RL work, default to an observable training process. Keep progress
-visible in the local session, and pair training with a visual before/after check
-of the creature behavior whenever possible. Do not send GA or RL training to the
-background by default. Before starting a long GA or RL run, tell the student:
+For GA and RL work, default to an observable training process. Treat "GA",
+"genetic algorithm", "遗传算法", "遗传算法训练", "强化学习", and "RL" as training
+requests that should start in foreground visual mode unless the student asks for
+background execution. Keep progress visible in the local session, and pair
+training with a visual before/after check of the creature behavior whenever
+possible. Do not send GA or RL training to the background by default. Before
+starting a long GA or RL run, tell the student:
 "训练会以前台可视化方式运行；如果希望加快进度，可以转为后台并行执行。"
 Use background training only if the student explicitly asks to continue other
 work while training runs.
 
 Use these classroom methods for visual GA and visual RL. "Visual" means the
 student can see the baseline behavior, watch foreground training progress, and
-then inspect the trained result in the local simulation. Do not promise
-real-time rendered frames for every training evaluation unless that feature has
-been added separately.
+then inspect the trained result in the local simulation. For RL, the default
+implementation renders every episode in pygame. For GA, the default classroom
+flow is also visual and foreground: show baseline simulation, run the GA with
+visible generation-by-generation progress, then show the trained result in the
+local simulation. Do not promise real-time rendered frames for every GA genome
+evaluation unless that feature has been added separately.
 
 ### Visual GA Method
 
@@ -118,10 +124,12 @@ parameters.
    that this is a setup step and ask before modifying the student's creature
    file.
 
-3. Before launching GA, remind the student that foreground progress is the
-   default visual training mode and that they can ask to switch to background
-   parallel execution if they want to move faster. Then run GA in the foreground
-   so the student sees generation-by-generation progress:
+3. When the student asks for "GA", "genetic algorithm", "遗传算法", or
+   "遗传算法训练", treat it as a request to launch this visual GA route by
+   default. Before launching GA, remind the student that foreground visual
+   training is the default and that they can ask to switch to background
+   parallel execution if they want to move faster. Then run GA in the
+   foreground so the student sees generation-by-generation progress:
 
    ```bash
    python3 train.py --method ga --creature creatures/<student_creature>.py --generations 20 --history-output ga_history.json --output best_params.json
