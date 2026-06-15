@@ -5,7 +5,7 @@ import random
 from dataclasses import asdict, dataclass
 from typing import Callable
 
-from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from config import FPS, SCREEN_HEIGHT, SCREEN_WIDTH, SIDEBAR_WIDTH
 from creature import Creature, Perception
 from creature_loader import load_creatures
 from training.evaluation import reset_entity_ids
@@ -14,6 +14,7 @@ from world import World
 
 
 ProgressFn = Callable[[str], None]
+VisualFrameFn = Callable[[World], bool]
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,9 @@ class RLConfig:
     height: int = SCREEN_HEIGHT
     seed: int | None = None
     quiet_opponent_warnings: bool = True
+    visualize_episodes: bool = False
+    visual_fps: int = FPS
+    visual_frame_callback: VisualFrameFn | None = None
 
     def __post_init__(self):
         if self.episodes < 1:
@@ -40,6 +44,8 @@ class RLConfig:
             raise ValueError("epsilon must be between 0 and 1")
         if not 0 <= self.min_epsilon <= 1:
             raise ValueError("min_epsilon must be between 0 and 1")
+        if self.visual_fps < 1:
+            raise ValueError("visual_fps must be at least 1")
 
 
 @dataclass
@@ -96,6 +102,33 @@ class QPolicy:
         next_best = 0.0 if done or next_state is None else max(self.values(next_state).values())
         target = reward + self.discount * next_best
         values[action] = current + self.learning_rate * (target - current)
+
+
+class PygameEpisodeVisualizer:
+    def __init__(self, width: int, height: int, fps: int):
+        import pygame
+        from renderer import Renderer
+
+        pygame.init()
+        self.pygame = pygame
+        self.screen = pygame.display.set_mode((width + SIDEBAR_WIDTH, height))
+        pygame.display.set_caption("RL Training - LearningCreature")
+        self.renderer = Renderer(self.screen, sidebar_width=SIDEBAR_WIDTH)
+        self.clock = pygame.time.Clock()
+        self.fps = fps
+
+    def render(self, world: World) -> bool:
+        for event in self.pygame.event.get():
+            if event.type == self.pygame.QUIT:
+                return False
+            if event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_ESCAPE:
+                return False
+        self.renderer.render(world)
+        self.clock.tick(self.fps)
+        return True
+
+    def close(self):
+        self.pygame.quit()
 
 
 class RLTrainer:
@@ -182,10 +215,24 @@ class RLTrainer:
             world._class_map[creature.creature_type] = type(creature)
 
         last_alive_tick = 0
-        while not world.game_over:
-            if any(c.is_alive and isinstance(c, LearningCreature) for c in world.creatures):
-                last_alive_tick = world.tick
-            world.update()
+        visualizer = None
+        if self.config.visualize_episodes and self.config.visual_frame_callback is None:
+            visualizer = PygameEpisodeVisualizer(
+                self.config.width,
+                self.config.height,
+                self.config.visual_fps,
+            )
+        try:
+            while not world.game_over:
+                if any(c.is_alive and isinstance(c, LearningCreature) for c in world.creatures):
+                    last_alive_tick = world.tick
+                world.update()
+                if not self._render_episode_frame(world, visualizer):
+                    world.game_over = True
+                    break
+        finally:
+            if visualizer is not None:
+                visualizer.close()
 
         survivors = [c for c in world.creatures if c.is_alive and isinstance(c, LearningCreature)]
         won = world.winner is not None and isinstance(world.winner, LearningCreature)
@@ -209,6 +256,19 @@ class RLTrainer:
             total_energy=total_energy,
             epsilon=policy.epsilon,
         )
+
+    def _render_episode_frame(
+        self,
+        world: World,
+        visualizer: PygameEpisodeVisualizer | None,
+    ) -> bool:
+        if not self.config.visualize_episodes:
+            return True
+        if self.config.visual_frame_callback is not None:
+            return self.config.visual_frame_callback(world)
+        if visualizer is not None:
+            return visualizer.render(world)
+        return True
 
     def _opponents(self) -> list[type[Creature]]:
         if self.opponent_classes is not None:

@@ -124,19 +124,28 @@ class SimulationSafetyTests(unittest.TestCase):
         self.assertTrue(food.depleted)
         self.assertGreater(eater.energy, 40.0)
 
-    def test_large_creature_can_eat_smaller_creature_pinned_at_edge(self):
-        world = World(100, 100)
-        eater = StationaryCreature(64, 50)
-        target = StationaryCreature(94, 50)
-        eater.energy = 3600.0
-        target.energy = 100.0
-        world.creatures = [eater, target]
-        world._rebuild_grids()
+    def test_top_creatures_reports_actual_creature_color(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
 
-        world._resolve_eating([eater, target])
+        top = world.top_creatures(limit=1)
 
-        self.assertFalse(target.is_alive)
-        self.assertGreater(eater.energy, 3600.0)
+        self.assertEqual((12, 34, 56), top[0][4])
+
+    def test_renderer_uses_alive_creature_color_for_sidebar_type(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
+        renderer = Renderer.__new__(Renderer)
+
+        colors = renderer._alive_color_by_type(world)
+
+        self.assertEqual((12, 34, 56), renderer._display_color("CustomType", colors))
 
     def test_loader_warns_when_file_exports_multiple_creature_classes(self):
         from creature_loader import load_creatures

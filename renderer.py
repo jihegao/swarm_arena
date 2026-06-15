@@ -10,9 +10,14 @@ from config import (
     GAME_OVER_COLOR,
     FOOD_COLOR,
     DEFAULT_CREATURE_COLOR,
+    CREATURE_COLORS,
     GAME_OVER_TICK,
     SIDEBAR_WIDTH,
 )
+
+
+LEARNING_CREATURE_TYPE = "LearningCreature"
+LEARNING_HIGHLIGHT_COLOR = (255, 230, 80)
 
 
 class Renderer:
@@ -51,17 +56,22 @@ class Renderer:
                 continue
             radius = max(2, int(c.size))
             pygame.draw.circle(self.screen, c.color, (int(c.x), int(c.y)), radius)
+            if c.creature_type == LEARNING_CREATURE_TYPE:
+                self._draw_learning_highlight(c, radius)
             dir_len = radius * 0.7
             tip_x = int(c.x + math.cos(c.angle) * dir_len)
             tip_y = int(c.y + math.sin(c.angle) * dir_len)
             pygame.draw.line(self.screen, (255, 255, 255), (int(c.x), int(c.y)), (tip_x, tip_y), 1)
 
-    def _colors_by_type(self, creatures: list[Creature]) -> dict[str, tuple[int, int, int]]:
-        colors: dict[str, tuple[int, int, int]] = {}
-        for c in creatures:
-            if c.is_alive and c.creature_type not in colors:
-                colors[c.creature_type] = c.color
-        return colors
+    def _draw_learning_highlight(self, creature: Creature, radius: int):
+        center = (int(creature.x), int(creature.y))
+        outer_radius = radius + 5
+        pygame.draw.circle(self.screen, LEARNING_HIGHLIGHT_COLOR, center, outer_radius, 2)
+        pygame.draw.circle(self.screen, (255, 255, 255), center, outer_radius + 3, 1)
+
+        label = self.small_font.render("LC", True, LEARNING_HIGHLIGHT_COLOR)
+        label_rect = label.get_rect(center=(center[0], center[1] - outer_radius - 8))
+        self.screen.blit(label, label_rect)
 
     def _draw_hud(self, world: World):
         counts = world.alive_count_by_type()
@@ -99,15 +109,20 @@ class Renderer:
         y += 6
 
         pop = world.population_ranking()
-        colors_by_type = self._colors_by_type(world.creatures)
+        colors_by_type = self._alive_color_by_type(world)
         total = sum(n for _, n in pop)
         max_pop = max(n for _, n in pop) if pop else 1
         bar_max_w = sw - 100
 
         for ctype, count in pop:
-            color = colors_by_type.get(ctype, DEFAULT_CREATURE_COLOR)
+            color = self._display_color(ctype, colors_by_type)
             pygame.draw.rect(self.screen, color, (sx + 10, y + 3, 10, 10))
-            label = self.row_font.render(f"{ctype}", True, (200, 200, 200))
+            if ctype == LEARNING_CREATURE_TYPE:
+                pygame.draw.rect(self.screen, LEARNING_HIGHLIGHT_COLOR, (sx + 8, y + 1, sw - 16, 24), 1)
+                marker = self.small_font.render("LC", True, LEARNING_HIGHLIGHT_COLOR)
+                self.screen.blit(marker, (sx + sw - 62, y + 1))
+            label_color = LEARNING_HIGHLIGHT_COLOR if ctype == LEARNING_CREATURE_TYPE else (200, 200, 200)
+            label = self.row_font.render(f"{ctype}", True, label_color)
             self.screen.blit(label, (sx + 24, y))
             num = self.row_font.render(f"{count}", True, (255, 255, 255))
             self.screen.blit(num, (sx + sw - 36, y))
@@ -131,13 +146,15 @@ class Renderer:
         y += 16
 
         top = world.top_creatures(limit=12)
-        for rank, (name, ctype, energy, size) in enumerate(top, 1):
-            color = colors_by_type.get(ctype, DEFAULT_CREATURE_COLOR)
+        for rank, (name, ctype, energy, size, color) in enumerate(top, 1):
             pygame.draw.rect(self.screen, color, (sx + 6, y + 2, 4, 14))
+            if ctype == LEARNING_CREATURE_TYPE:
+                pygame.draw.rect(self.screen, LEARNING_HIGHLIGHT_COLOR, (sx + 4, y, sw - 12, 17), 1)
 
             display_name = name[:14]
             line = f"{rank:>2} {display_name:<14} {energy:>7.0f}  {size:>5.1f}"
-            surf = self.row_font.render(line, True, (200, 200, 200))
+            line_color = LEARNING_HIGHLIGHT_COLOR if ctype == LEARNING_CREATURE_TYPE else (200, 200, 200)
+            surf = self.row_font.render(line, True, line_color)
             self.screen.blit(surf, (sx + 14, y))
             y += 17
 
@@ -181,3 +198,20 @@ class Renderer:
         hint = self.font.render("Press R to restart", True, (140, 140, 160))
         hint_rect = hint.get_rect(center=(self.world_area_width // 2, self.sh // 2 + 45))
         self.screen.blit(hint, hint_rect)
+
+    def _alive_color_by_type(self, world: World) -> dict[str, tuple[int, int, int]]:
+        colors: dict[str, tuple[int, int, int]] = {}
+        for creature in world.creatures:
+            if creature.is_alive and creature.creature_type not in colors:
+                colors[creature.creature_type] = creature.color
+        return colors
+
+    def _display_color(
+        self,
+        creature_type: str,
+        colors_by_type: dict[str, tuple[int, int, int]],
+    ) -> tuple[int, int, int]:
+        return colors_by_type.get(
+            creature_type,
+            CREATURE_COLORS.get(creature_type, DEFAULT_CREATURE_COLOR),
+        )

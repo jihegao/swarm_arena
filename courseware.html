@@ -84,6 +84,18 @@ tr:nth-child(odd) td { background: #161b22; }
 .step-row p { margin: 0; font-size: 1.1em; }
 
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.method-flow { display: grid; grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr; gap: 10px; align-items: stretch; margin: 18px 0; }
+.flow-node { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; min-height: 104px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.flow-node strong { color: #79c0ff; font-size: 1.05em; margin-bottom: 6px; }
+.flow-node span { color: #8b949e; font-size: 0.92em; line-height: 1.45; }
+.flow-arrow { display: flex; align-items: center; justify-content: center; color: #f0883e; font-size: 1.6em; font-weight: bold; }
+.gene-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.gene-pill { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 8px 10px; color: #c9d1d9; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.88em; }
+.q-table { display: grid; grid-template-columns: 1fr repeat(3, 0.85fr); border: 1px solid #30363d; border-radius: 8px; overflow: hidden; margin-top: 12px; }
+.q-cell { padding: 10px; border-right: 1px solid #30363d; border-bottom: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 0.92em; }
+.q-cell:nth-child(4n) { border-right: 0; }
+.q-head { background: #21262d; color: #79c0ff; font-weight: bold; }
+.q-best { color: #3fb950; font-weight: bold; }
 
 .nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 100; }
 .nav button { background: #21262d; border: 1px solid #30363d; color: #e6edf3; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2em; cursor: pointer; transition: all 0.2s; }
@@ -99,6 +111,10 @@ tr:nth-child(odd) td { background: #161b22; }
   p, li { font-size: 1em; }
   .two-col { grid-template-columns: 1fr; }
   .card-grid { grid-template-columns: 1fr; }
+  .method-flow { grid-template-columns: 1fr; }
+  .flow-arrow { transform: rotate(90deg); }
+  .q-table { grid-template-columns: 1fr; }
+  .q-cell, .q-cell:nth-child(4n) { border-right: 0; }
 }
 </style>
 </head>
@@ -111,10 +127,10 @@ tr:nth-child(odd) td { background: #161b22; }
 <div class="slide active" data-index="0">
   <div class="hero-icon">&#x1F3AE;</div>
   <h1>竞争生存游戏</h1>
-  <p class="subtitle">Competitive Survival — 编写 AI，让你的物种统治世界</p>
+  <p class="subtitle">Competitive Survival — 观察、选择路线、验证，再发布你的生物</p>
   <p style="font-size:1.1em; color:#8b949e; max-width:700px;">
     在 2D 世界中，你设计的生物将与其他生物竞争：抢食物、吃对手、繁殖后代。<br>
-    <span class="highlight">5000 tick 后，存活数量最多的物种获胜。</span>
+    本节课的目标是完成一次小实验：<span class="highlight">观察现象 → 选择技术路线 → 验证改动 → 署名发布。</span>
   </p>
   <div style="margin-top:40px; display:flex; gap:24px;">
     <div class="card" style="text-align:center; min-width:120px;">
@@ -168,7 +184,7 @@ tr:nth-child(odd) td { background: #161b22; }
   <div class="two-col">
     <div>
       <h3>运行游戏</h3>
-      <pre><code><span class="kw">python</span> main.py</code></pre>
+      <pre><code><span class="kw">python3</span> main.py</code></pre>
       <h3>操作按键</h3>
       <table>
         <tr><th>按键</th><th>功能</th></tr>
@@ -178,76 +194,65 @@ tr:nth-child(odd) td { background: #161b22; }
       </table>
     </div>
     <div>
-      <h3>创建你的生物</h3>
-      <p>在 <span class="code-inline">creatures/</span> 目录下新建 <span class="code-inline">.py</span> 文件，定义一个继承自 <span class="code-inline">Creature</span> 的类，实现 <span class="code-inline">decide()</span> 方法。重启游戏即可自动加入。</p>
+      <h3>课堂入口</h3>
+      <p>先观察一个已有行为，再选择规则、GA 或 Q-learning 路线。AI 助手应先读取 <span class="code-inline">agent.md</span>，引导你说出现象，而不是直接替你写完整生物。</p>
       <div class="tip-box" style="margin-top:20px;">
-        <p>每个合法的 Creature 子类会生成相同数量的初始实例。</p>
+        <p>本节课只做一个聚焦改动：能讲清楚、能复现、能署名。</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Slide 4: Step-by-step Guide -->
+<!-- Slide 4: Exploration Flow -->
 <div class="slide" data-index="3">
-  <h2>&#x1F4CB; 操作指南 — 分步演示</h2>
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+  <h2>&#x1F4CB; 课堂实验探索流程</h2>
+  <div class="two-col">
     <div>
-      <div class="step-row"><span class="step-number">1</span><p>打开终端，进入项目目录</p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
-        <span class="screenshot-icon">&#x1F4BB;</span>
-        <span class="screenshot-label">截图：终端输入 cd 命令</span>
-        <img src="screenshots/step1_terminal.png" alt="step1" onerror="this.style.display='none'">
+      <div class="step-row"><span class="step-number">1</span><p>观察现象</p></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">先看，不急着写</div>
+        <div class="card-desc">运行 <span class="code-inline">python3 main.py</span>，说清楚你观察了哪种生物、发生了什么、你猜原因是什么、怎样算改进。</div>
       </div>
 
-      <div class="step-row"><span class="step-number">2</span><p>运行游戏 <span class="code-inline">python main.py</span></p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
-        <span class="screenshot-icon">&#x1F3AE;</span>
-        <span class="screenshot-label">截图：游戏启动画面</span>
-        <img src="screenshots/step2_run_game.png" alt="step2" onerror="this.style.display='none'">
-      </div>
-
-      <div class="step-row"><span class="step-number">3</span><p>在 <span class="code-inline">creatures/</span> 下新建 <span class="code-inline">.py</span> 文件</p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:0;">
-        <span class="screenshot-icon">&#x1F4DD;</span>
-        <span class="screenshot-label">截图：编辑器中创建新文件</span>
-        <img src="screenshots/step3_create_file.png" alt="step3" onerror="this.style.display='none'">
+      <div class="step-row"><span class="step-number">2</span><p>选择技术路线</p></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">规则 / GA / Q-learning</div>
+        <div class="card-desc">只选一条路线：写一条可解释规则，调一组参数，或用 RL 探索高层动作取舍。</div>
       </div>
     </div>
     <div>
-      <div class="step-row"><span class="step-number">4</span><p>编写 Creature 类和 decide() 方法</p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
-        <span class="screenshot-icon">&#x270D;&#xFE0F;</span>
-        <span class="screenshot-label">截图：编辑器中编写代码</span>
-        <img src="screenshots/step4_write_code.png" alt="step4" onerror="this.style.display='none'">
+      <div class="step-row"><span class="step-number">3</span><p>优化并验证</p></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">一次只改一个点</div>
+        <div class="card-desc">记录“现象、假设、本轮改动、验证方式、观察结果、下一轮建议”。变差也算证据。</div>
       </div>
 
-      <div class="step-row"><span class="step-number">5</span><p>重启游戏，观察你的生物表现</p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:16px;">
-        <span class="screenshot-icon">&#x1F50D;</span>
-        <span class="screenshot-label">截图：游戏中看到你的生物</span>
-        <img src="screenshots/step5_observe.png" alt="step5" onerror="this.style.display='none'">
-      </div>
-
-      <div class="step-row"><span class="step-number">6</span><p>按 <span class="code-inline">SPACE</span> 暂停，调整策略后按 <span class="code-inline">R</span> 重来</p></div>
-      <div class="screenshot-placeholder" style="height:120px; margin-bottom:0;">
-        <span class="screenshot-icon">&#x1F504;</span>
-        <span class="screenshot-label">截图：调试与迭代过程</span>
-        <img src="screenshots/step6_iterate.png" alt="step6" onerror="this.style.display='none'">
+      <div class="step-row"><span class="step-number">4</span><p>发布署名</p></div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">让别人能复现</div>
+        <div class="card-desc">最终文件要有唯一生物名、学生作者、路线、验证说明，以及可重复的运行或训练方式。</div>
       </div>
     </div>
+  </div>
+  <div class="tip-box">
+    <p>AI 助手的任务是做课堂教练：一次问一个问题，保留学生自己的观察、选择、命名和署名。</p>
   </div>
 </div>
 
 <!-- Slide 5: Your Task -->
 <div class="slide" data-index="4">
   <h2>&#x1F4DD; 你的任务</h2>
-  <p style="margin-bottom:20px;">只需要做两件事：<span class="highlight">创建类</span> 和 <span class="highlight">实现 decide()</span>。</p>
+  <p style="margin-bottom:20px;">在完成观察和路线选择后，再创建自己的文件。规则路线的核心是两件事：<span class="highlight">创建类</span> 和 <span class="highlight">实现 decide()</span>。</p>
   <h3>最小模板</h3>
   <pre><code><span class="kw">from</span> <span class="tp">__future__</span> <span class="kw">import</span> <span class="tp">annotations</span>
 <span class="kw">import</span> <span class="tp">math</span>, <span class="tp">os</span>, <span class="tp">sys</span>
 <span class="var">sys</span>.<span class="fn">path</span>.<span class="fn">insert</span>(<span class="num">0</span>, <span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">abspath</span>(<span class="var">__file__</span>))))
 <span class="kw">from</span> <span class="tp">creature</span> <span class="kw">import</span> <span class="tp">Creature</span>, <span class="tp">Perception</span>, <span class="tp">Action</span>
 
+<span class="cm"># Creature: MyCreature</span>
+<span class="cm"># Author: &lt;Student Name&gt;</span>
+<span class="cm"># Route: rule-based</span>
+<span class="cm"># Notes: baseline creature for the first observation</span>
 <span class="kw">class</span> <span class="tp">MyCreature</span>(<span class="tp">Creature</span>):
     <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>: <span class="tp">float</span>, <span class="var">y</span>: <span class="tp">float</span>):
         <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"MyCreature"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
@@ -255,7 +260,7 @@ tr:nth-child(odd) td { background: #161b22; }
     <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">perception</span>: <span class="tp">Perception</span>) -> <span class="tp">Action</span>:
         <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">perception</span>.<span class="var">self_angle</span>, <span class="var">self</span>.<span class="var">max_speed</span>)</code></pre>
   <div class="tip-box">
-    <p>这段代码创建了一个只会直线前进的橙色生物。你可以在此基础上逐步改进！</p>
+    <p>这段代码创建了一个只会直线前进的橙色生物。先运行观察，再把一条明确假设改进进去。</p>
   </div>
 </div>
 
@@ -497,14 +502,14 @@ tr:nth-child(odd) td { background: #161b22; }
   </div>
 </div>
 
-<!-- Slide 13: Strategy & Example -->
+<!-- Slide 13: Route Choice & Snippets -->
 <div class="slide" data-index="12">
-  <h2>&#x1F4A1; 策略提示与完整示例</h2>
+  <h2>&#x1F4A1; 三条技术路线</h2>
   <div class="card-grid" style="margin-bottom:16px;">
-    <div class="card"><div class="card-title">&#x2744;&#xFE0F; 滚雪球型</div><div class="card-desc">前期专注吃食物快速长大，体型大了吃别人。</div></div>
-    <div class="card"><div class="card-title">&#x1F4CA; 速繁殖型</div><div class="card-desc">尽快攒能量繁殖，靠数量优势取胜。</div></div>
-    <div class="card"><div class="card-title">&#x1F3AF; 猎人型</div><div class="card-desc">高速度+大视野，专门追杀比自己小的生物。</div></div>
-    <div class="card"><div class="card-title">&#x1F40D; 伏击型</div><div class="card-desc">躲在食物附近，等对手来吃时突然出手。</div></div>
+    <div class="card"><div class="card-title">&#x1F4DD; 规则行为</div><div class="card-desc">适合“看到 X 就做 Y”的想法。把一条自然语言规则翻译进 <span class="code-inline">decide()</span>。</div></div>
+    <div class="card"><div class="card-title">&#x1F9EC; GA 参数优化</div><div class="card-desc">适合调速度、视野、繁殖阈值等数字。目标类需要继承 <span class="code-inline">EvolvableCreature</span>。</div></div>
+    <div class="card"><div class="card-title">&#x1F9E0; Q-learning 策略探索</div><div class="card-desc">适合探索找食物、逃跑、追击、漫步、繁殖等高层动作。当前训练的是 <span class="code-inline">LearningCreature</span>。</div></div>
+    <div class="card"><div class="card-title">&#x1F50D; 验证记录</div><div class="card-desc">每轮记录：现象、假设、本轮改动、验证方式、观察结果、下一轮建议。</div></div>
   </div>
   <h3>常用代码片段</h3>
   <div class="two-col">
@@ -530,60 +535,154 @@ tr:nth-child(odd) td { background: #161b22; }
   </div>
 </div>
 
-<!-- Slide 14: Full Example -->
+<!-- Slide 14: GA Method -->
 <div class="slide" data-index="13">
-  <h2>&#x1F4BB; 完整示例：Survivor</h2>
-  <pre><code><span class="kw">class</span> <span class="tp">Survivor</span>(<span class="tp">Creature</span>):
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>: <span class="tp">float</span>, <span class="var">y</span>: <span class="tp">float</span>):
-        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"Survivor"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
-        <span class="var">self</span>.<span class="var">max_speed</span> = <span class="num">2.2</span>
-        <span class="var">self</span>.<span class="var">max_energy</span> = <span class="num">100.0</span>
-        <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">160.0</span>
-
-    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>: <span class="tp">Perception</span>) -> <span class="tp">Action</span>:
-        <span class="cm"># 1. 能量充足时繁殖</span>
-        <span class="kw">if</span> <span class="var">p</span>.<span class="var">self_energy</span> >= <span class="var">p</span>.<span class="var">self_max_energy</span> * <span class="num">2.5</span>:
-            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>, <span class="num">0</span>, <span class="var">reproduce</span>=<span class="kw">True</span>)
-        <span class="cm"># 2. 追杀比自己小的对手</span>
-        <span class="var">smaller</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> < <span class="var">p</span>.<span class="var">self_size</span>]
-        <span class="kw">if</span> <span class="var">smaller</span>:
-            <span class="var">t</span> = <span class="fn">min</span>(<span class="var">smaller</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
-            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">t</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>, <span class="var">t</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>), <span class="var">self</span>.<span class="var">max_speed</span>)
-        <span class="cm"># 3. 远离比自己大的对手</span>
-        <span class="var">bigger</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> > <span class="var">p</span>.<span class="var">self_size</span>]
-        <span class="kw">if</span> <span class="var">bigger</span>:
-            <span class="var">b</span> = <span class="fn">min</span>(<span class="var">bigger</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
-            <span class="kw">if</span> <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">b</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">b</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>) < <span class="num">60</span>:
-                <span class="var">flee</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">p</span>.<span class="var">self_y</span>-<span class="var">b</span>.<span class="var">y</span>, <span class="var">p</span>.<span class="var">self_x</span>-<span class="var">b</span>.<span class="var">x</span>)
-                <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">flee</span>, <span class="var">self</span>.<span class="var">max_speed</span>)
-        <span class="cm"># 4. 找食物或随机漫步</span>
-        <span class="kw">if</span> <span class="var">p</span>.<span class="var">nearby_food</span>:
-            <span class="var">f</span> = <span class="fn">min</span>(<span class="var">p</span>.<span class="var">nearby_food</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">f</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">f</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">f</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
-            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">f</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>, <span class="var">f</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>), <span class="var">self</span>.<span class="var">max_speed</span>*<span class="num">0.7</span>)
-        <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>+<span class="var">math</span>.<span class="fn">sin</span>(<span class="var">p</span>.<span class="var">self_x</span>*<span class="num">0.015</span>)*<span class="num">0.2</span>, <span class="var">self</span>.<span class="var">max_speed</span>*<span class="num">0.4</span>)</code></pre>
+  <h2>&#x1F9EC; GA 参数优化怎么讲</h2>
+  <p style="margin-bottom:14px;">GA 像一次“参数选拔赛”：规则已经有了，我们只是让很多组数字上场比较，留下更适合目标的那一组。</p>
+  <div class="method-flow">
+    <div class="flow-node"><strong>1. 多组参数</strong><span>速度、视野、逃跑距离、繁殖阈值各不相同</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>2. 模拟比赛</strong><span>每组参数都放进同一个世界里跑一遍</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>3. 看表现</strong><span>按生存时间、能量、数量或得分比较</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>4. 新一代</strong><span>留下高分参数，组合并做一点随机微调</span></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">学生要看懂什么</div>
+      <div class="card-desc">不是“机器变聪明了”，而是同一套行为规则换了更合适的数字。训练后要比较旧参数和新参数。</div>
+      <div class="gene-row">
+        <span class="gene-pill">max_speed</span>
+        <span class="gene-pill">vision_radius</span>
+        <span class="gene-pill">flee_distance</span>
+        <span class="gene-pill">reproduce_ratio</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">课堂提问</div>
+      <div class="card-desc">“这组参数为什么可能解决刚才的观察？” 例如速度更快是否真的抢到更多食物，繁殖更晚是否真的让后代更安全。</div>
+    </div>
+  </div>
 </div>
 
-<!-- Slide 15: Ending -->
+<!-- Slide 15: Q-learning Method -->
 <div class="slide" data-index="14">
+  <h2>&#x1F9E0; Q-learning 怎么讲</h2>
+  <p style="margin-bottom:14px;">Q-learning 像一本“动作经验表”：生物看到当前状态，试一个动作，拿到反馈，然后把这次经验记下来。</p>
+  <div class="method-flow">
+    <div class="flow-node"><strong>1. 看状态</strong><span>附近有没有食物、威胁、猎物，能量是否充足</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>2. 选动作</strong><span>找食物、逃跑、追击、漫步、繁殖</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>3. 得反馈</strong><span>能量变多、活得更久是好反馈；死亡是坏反馈</span></div>
+    <div class="flow-arrow">&#x2192;</div>
+    <div class="flow-node"><strong>4. 改表格</strong><span>下次遇到类似状态，更倾向高分动作</span></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">一张简化 Q 表</div>
+      <div class="q-table">
+        <div class="q-cell q-head">状态</div><div class="q-cell q-head">找食物</div><div class="q-cell q-head">逃跑</div><div class="q-cell q-head">追击</div>
+        <div class="q-cell">有大威胁</div><div class="q-cell">0.2</div><div class="q-cell q-best">1.8</div><div class="q-cell">-0.4</div>
+        <div class="q-cell">有小猎物</div><div class="q-cell">0.5</div><div class="q-cell">0.1</div><div class="q-cell q-best">1.3</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">当前项目边界</div>
+      <div class="card-desc"><span class="code-inline">train.py --method rl</span> 训练的是 <span class="code-inline">LearningCreature</span> 的高层策略实验。课堂目标是读出策略倾向，再迁移成学生自己的可读规则。</div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 16: Rule-Based Example -->
+<div class="slide" data-index="15">
+  <h2>&#x1F4DD; 完整示例 A：规则 Creature</h2>
+  <p style="margin-bottom:14px;">规则路线适合“看到 X 就做 Y”。这个例子直接用 <span class="code-inline">decide()</span> 写出逃跑、追击、找食物、繁殖。</p>
+  <pre><code><span class="kw">class</span> <span class="tp">RuleSurvivor</span>(<span class="tp">Creature</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>):
+        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"RuleSurvivor"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
+        <span class="var">self</span>.<span class="var">max_speed</span> = <span class="num">2.2</span>
+        <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">160</span>
+
+    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
+        <span class="kw">if</span> <span class="var">p</span>.<span class="var">self_energy</span> >= <span class="var">p</span>.<span class="var">self_max_energy</span> * <span class="num">2.5</span>:
+            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>, <span class="num">0</span>, <span class="var">reproduce</span>=<span class="kw">True</span>)
+        <span class="var">bigger</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> > <span class="var">p</span>.<span class="var">self_size</span>]
+        <span class="kw">if</span> <span class="var">bigger</span>:
+            <span class="var">enemy</span> = <span class="fn">min</span>(<span class="var">bigger</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
+            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">p</span>.<span class="var">self_y</span>-<span class="var">enemy</span>.<span class="var">y</span>, <span class="var">p</span>.<span class="var">self_x</span>-<span class="var">enemy</span>.<span class="var">x</span>), <span class="var">self</span>.<span class="var">max_speed</span>)
+        <span class="cm"># 然后追小生物；没目标时找食物或漫步。</span></code></pre>
+  <div class="tip-box"><p>教学重点：先让学生说出规则，再把一条规则翻译成代码。</p></div>
+</div>
+
+<!-- Slide 17: GA Example -->
+<div class="slide" data-index="16">
+  <h2>&#x1F9EC; 完整示例 B：GA Creature</h2>
+  <p style="margin-bottom:14px;">GA 路线要继承 <span class="code-inline">EvolvableCreature</span>。规则仍然可读，GA 只负责搜索数字。</p>
+  <pre><code><span class="kw">class</span> <span class="tp">GeneTunedSurvivor</span>(<span class="tp">EvolvableCreature</span>):
+    <span class="var">gene_defs</span> = {
+        <span class="str">"max_speed"</span>: (<span class="num">1.4</span>, <span class="num">3.2</span>), <span class="str">"vision_radius"</span>: (<span class="num">120</span>, <span class="num">240</span>),
+        <span class="str">"flee_distance"</span>: (<span class="num">35</span>, <span class="num">100</span>), <span class="str">"reproduce_ratio"</span>: (<span class="num">2.0</span>, <span class="num">3.2</span>),
+        <span class="str">"food_speed_ratio"</span>: (<span class="num">0.45</span>, <span class="num">1.0</span>),
+    }
+    <span class="var">default_genes</span> = {
+        <span class="str">"max_speed"</span>: <span class="num">2.2</span>, <span class="str">"vision_radius"</span>: <span class="num">170</span>,
+        <span class="str">"flee_distance"</span>: <span class="num">60</span>, <span class="str">"reproduce_ratio"</span>: <span class="num">2.5</span>,
+        <span class="str">"food_speed_ratio"</span>: <span class="num">0.75</span>,
+    }
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>, <span class="var">genes</span>=<span class="kw">None</span>):
+        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="var">genes</span>=<span class="var">genes</span> <span class="kw">or</span> <span class="var">self</span>.<span class="var">default_genes</span>,
+                         <span class="var">creature_type</span>=<span class="str">"GeneTunedSurvivor"</span>, <span class="var">color</span>=(<span class="num">80</span>, <span class="num">210</span>, <span class="num">255</span>))
+    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
+        <span class="cm"># 使用 self.genes["flee_distance"]、self.genes["reproduce_ratio"] 等数字。</span>
+        <span class="cm"># 训练后把 best_params.json 中认可的值填回 default_genes。</span></code></pre>
+  <div class="tip-box"><p>运行：<span class="code-inline">python3 train.py --method ga --creature creatures/gene_tuned_survivor.py --generations 20</span></p></div>
+</div>
+
+<!-- Slide 18: RL Example -->
+<div class="slide" data-index="17">
+  <h2>&#x1F9E0; 完整示例 C：RL Creature</h2>
+  <p style="margin-bottom:14px;">RL 路线先训练 <span class="code-inline">best_policy.json</span>，再让生物读取 Q 表，根据当前状态选最高分动作。</p>
+  <pre><code><span class="kw">from</span> <span class="tp">training.policy</span> <span class="kw">import</span> <span class="tp">decode_action</span>, <span class="tp">discrete_state_key</span>, <span class="tp">encode_features</span>
+<span class="kw">from</span> <span class="tp">training.rl</span> <span class="kw">import</span> <span class="tp">load_q_policy</span>
+
+<span class="kw">class</span> <span class="tp">PolicyTableSurvivor</span>(<span class="tp">Creature</span>):
+    <span class="var">_policy</span> = <span class="kw">None</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>):
+        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"PolicyTableSurvivor"</span>, (<span class="num">190</span>, <span class="num">120</span>, <span class="num">255</span>))
+        <span class="var">self</span>.<span class="var">max_speed</span>, <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">2.2</span>, <span class="num">180</span>
+        <span class="kw">if</span> <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span> <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="var">root</span> = <span class="var">os</span>.<span class="var">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">abspath</span>(<span class="var">__file__</span>)))
+            <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span> = <span class="fn">load_q_policy</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">join</span>(<span class="var">root</span>, <span class="str">"best_policy.json"</span>))
+    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
+        <span class="var">state</span> = <span class="fn">discrete_state_key</span>(<span class="fn">encode_features</span>(<span class="var">p</span>))
+        <span class="var">action</span> = <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span>.<span class="fn">select_action</span>(<span class="var">state</span>, <span class="var">explore</span>=<span class="kw">False</span>)
+        <span class="kw">return</span> <span class="fn">decode_action</span>(<span class="var">action</span>, <span class="var">p</span>, <span class="var">self</span>)</code></pre>
+  <div class="tip-box"><p>运行：<span class="code-inline">python3 train.py --method rl --episodes 200 --output best_policy.json</span></p></div>
+</div>
+
+<!-- Slide 19: Ending -->
+<div class="slide" data-index="18">
   <div class="hero-icon">&#x1F3C6;</div>
-  <h1>祝你好运！</h1>
-  <p class="subtitle">让你的物种统治这个世界</p>
+  <h1>完成你的实验闭环</h1>
+  <p class="subtitle">观察、选择、验证、署名发布</p>
   <div class="card-grid" style="max-width:700px; margin: 0 auto;">
     <div class="card">
-      <div class="card-title">&#x1F680; 开始动手</div>
-      <div class="card-desc">在 <span class="code-inline">creatures/</span> 目录下创建你的 <span class="code-inline">.py</span> 文件</div>
+      <div class="card-title">&#x1F50D; 观察现象</div>
+      <div class="card-desc">说清楚你看到了什么、发生在哪里、怎样算改进</div>
     </div>
     <div class="card">
-      <div class="card-title">&#x1F50D; 测试迭代</div>
-      <div class="card-desc">运行游戏观察表现，反复调整策略</div>
+      <div class="card-title">&#x1F6E0;&#xFE0F; 选择路线</div>
+      <div class="card-desc">规则行为、GA 参数优化、Q-learning 策略探索三选一</div>
     </div>
     <div class="card">
-      <div class="card-title">&#x1F9E0; 思考方向</div>
-      <div class="card-desc">速度 vs 能量 vs 视野，找到最佳平衡</div>
+      <div class="card-title">&#x1F4CA; 验证结果</div>
+      <div class="card-desc">用可视化运行、训练输出或前后对比记录证据</div>
     </div>
     <div class="card">
-      <div class="card-title">&#x1F91D; 公平竞争</div>
-      <div class="card-desc">所有生物共享相同规则，AI 决定胜负</div>
+      <div class="card-title">&#x1F4DD; 发布署名</div>
+      <div class="card-desc">写上唯一生物名、作者、路线和一条验证说明</div>
     </div>
   </div>
 </div>
@@ -592,7 +691,7 @@ tr:nth-child(odd) td { background: #161b22; }
 
 <div class="nav">
   <button id="prevBtn" onclick="go(-1)">&#x25C0;</button>
-  <span class="page-num" id="pageNum">1 / 15</span>
+  <span class="page-num" id="pageNum">1 / 19</span>
   <button id="nextBtn" onclick="go(1)">&#x25B6;</button>
 </div>
 
