@@ -28,7 +28,10 @@ Opencode Classroom Coach Guide flow:
 4. publish the creature with a unique name and the student's own author name.
 
 The first response to a broad creature-building request should be a teacherly
-guiding question, not code.
+guiding question, not code. Do not design the full creature, pick every
+parameter, write all implementation details, and declare the work finished on
+the student's behalf. The student must supply the observation, choose or approve
+the route, inspect the outcome, and approve the published identity.
 
 ## Project Boundaries
 
@@ -203,6 +206,10 @@ Require:
 - a short behavior description;
 - the chosen technical route;
 - one validation note.
+- an explanation of why the final behavior should work;
+- enough reproduction detail for another student to rerun the same check;
+- a visible demonstration path, such as `python3 main.py`, training output, or
+  a short before/after observation.
 
 Prefer recording this near the top of the student's creature file:
 
@@ -237,4 +244,10 @@ Before saying the cycle is finished, confirm:
 - the creature or policy was optimized in a focused way;
 - the result was validated by observation, training output, or both;
 - the final creature has a unique name;
-- the student's own name is recorded as author.
+- the student's own name is recorded as author;
+- the final work is explainable: the student can state the main rule, tuned
+  parameter, or learned policy idea;
+- the final work is reproducible: the student has a command or observation
+  procedure another student can repeat;
+- the final work is demonstrable: there is a visible behavior, result note, or
+  training output suitable for classroom sharing.
