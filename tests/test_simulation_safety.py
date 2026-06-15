@@ -10,6 +10,7 @@ from contextlib import redirect_stdout
 
 from creature import Action, Creature, Perception
 from food import Food
+from renderer import Renderer
 from world import World
 
 
@@ -114,6 +115,29 @@ class SimulationSafetyTests(unittest.TestCase):
 
         self.assertTrue(food.depleted)
         self.assertGreater(eater.energy, 40.0)
+
+    def test_top_creatures_reports_actual_creature_color(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
+
+        top = world.top_creatures(limit=1)
+
+        self.assertEqual((12, 34, 56), top[0][4])
+
+    def test_renderer_uses_alive_creature_color_for_sidebar_type(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
+        renderer = Renderer.__new__(Renderer)
+
+        colors = renderer._alive_color_by_type(world)
+
+        self.assertEqual((12, 34, 56), renderer._display_color("CustomType", colors))
 
     def test_loader_warns_when_file_exports_multiple_creature_classes(self):
         from creature_loader import load_creatures
