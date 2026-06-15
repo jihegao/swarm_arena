@@ -9,6 +9,7 @@ import sys
 from evolvable import EvolvableCreature
 from trainer import GAConfig, GeneticTrainer
 from training.rl import RLConfig, RLTrainer, save_rl_result
+from training.visual_status import PygameStatusWindow, ga_status_from_progress
 
 
 def load_evolvable_class(
@@ -128,7 +129,18 @@ def train_ga(args: argparse.Namespace) -> int:
         f"method=ga generations={config.generations} population={config.population_size}",
         flush=True,
     )
-    result = trainer.train(lambda message: print(message, flush=True))
+    status_window = PygameStatusWindow()
+
+    def show_progress(message: str):
+        print(message, flush=True)
+        status = ga_status_from_progress(message)
+        if status is not None:
+            status_window.update(status)
+
+    try:
+        result = trainer.train(show_progress)
+    finally:
+        status_window.close()
 
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(result.best_genes, f, indent=2, sort_keys=True)
