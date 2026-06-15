@@ -57,6 +57,40 @@ python3 train.py --method rl --episodes 200 --output best_policy.json
 Use `python` instead of `python3` only if that is the active local convention in
 the student's environment.
 
+## Startup, Run, And Training Rules
+
+At the start of a classroom session, check whether the local Python and pygame
+environment is ready before asking the student to run or train anything.
+
+Use lightweight checks such as:
+
+```bash
+python3 --version
+python3 -c "import pygame; print(pygame.version.ver)"
+```
+
+If Python or pygame is missing, pause the practice flow and guide the student or
+teacher through environment setup before changing creature code. Do not let a
+missing runtime look like a failed creature design.
+
+When the student says "运行", "run it", "start", or asks to see the creature in
+action, run the project locally instead of only describing the command. Prefer
+the visible simulation command:
+
+```bash
+python3 main.py
+```
+
+Keep the local run visible to the student whenever the teaching goal is
+observation. Use a headless or background run only when the student explicitly
+asks for background execution, batch comparison, or non-visual evidence.
+
+For GA and RL work, default to an observable training process. Keep progress
+visible in the local session, and pair training with a visual before/after check
+of the creature behavior whenever possible. Do not send GA or RL training to the
+background by default. Use background training only if the student explicitly
+asks to continue other work while training runs.
+
 ## One-Lesson Practice Cycle
 
 Guide the conversation through these four stages in order.
