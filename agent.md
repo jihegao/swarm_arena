@@ -91,6 +91,93 @@ of the creature behavior whenever possible. Do not send GA or RL training to the
 background by default. Use background training only if the student explicitly
 asks to continue other work while training runs.
 
+Use these classroom methods for visual GA and visual RL. "Visual" means the
+student can see the baseline behavior, watch foreground training progress, and
+then inspect the trained result in the local simulation. Do not promise
+real-time rendered frames for every training evaluation unless that feature has
+been added separately.
+
+### Visual GA Method
+
+Use this method when the student has a rule structure but wants to tune
+parameters.
+
+1. Show the baseline creature first:
+
+   ```bash
+   python3 main.py
+   ```
+
+   Ask the student to name what they see: survival time, food seeking, fleeing,
+   reproduction timing, or failure mode.
+
+2. Confirm the creature is trainable. GA needs the target class to inherit from
+   `EvolvableCreature` and define genes. If it is not trainable yet, explain
+   that this is a setup step and ask before modifying the student's creature
+   file.
+
+3. Run GA in the foreground so the student sees generation-by-generation
+   progress:
+
+   ```bash
+   python3 train.py --method ga --creature creatures/<student_creature>.py --generations 20 --history-output ga_history.json --output best_params.json
+   ```
+
+4. Open or summarize `best_params.json` and, if written, `ga_history.json`.
+   Explain which parameters changed and connect them to the student's original
+   observation.
+
+5. Apply only the selected tuned parameters to the student's creature after the
+   student approves them.
+
+6. Run the visible simulation again:
+
+   ```bash
+   python3 main.py
+   ```
+
+   Compare before and after using the same observation language from step 1.
+
+### Visual RL Method
+
+Use this method when the student wants to explore high-level action choices
+such as seeking food, fleeing threats, chasing prey, wandering, or reproducing.
+
+1. Show the baseline behavior or the built-in opponents first:
+
+   ```bash
+   python3 main.py
+   ```
+
+   Ask the student which high-level decision looks wrong or interesting.
+
+2. Explain the current RL boundary: `train.py --method rl` trains a
+   `LearningCreature` policy as a strategy experiment. It does not directly
+   rewrite an arbitrary student creature.
+
+3. Run RL in the foreground so episode progress is visible:
+
+   ```bash
+   python3 train.py --method rl --episodes 200 --output best_policy.json
+   ```
+
+4. Inspect `best_policy.json` with the student. Focus on the learned action
+   pattern, not raw table size. Translate the useful idea into plain language:
+   for example, "when threats are near, fleeing is valued more than chasing."
+
+5. Ask whether the student wants to migrate the learned idea into their own
+   creature as readable rules or a small policy lookup. Do not expand the RL
+   trainer unless the teacher asks for a separate engineering task.
+
+6. Run the visible simulation again after the student-approved change:
+
+   ```bash
+   python3 main.py
+   ```
+
+   Compare whether the new behavior is visible and whether it addresses the
+   original observation.
+
 ## One-Lesson Practice Cycle
 
 Guide the conversation through these four stages in order.
