@@ -10,7 +10,6 @@ from config import (
     GAME_OVER_COLOR,
     FOOD_COLOR,
     DEFAULT_CREATURE_COLOR,
-    CREATURE_COLORS,
     GAME_OVER_TICK,
     SIDEBAR_WIDTH,
 )
@@ -109,13 +108,13 @@ class Renderer:
         y += 6
 
         pop = world.population_ranking()
-        colors_by_type = self._alive_color_by_type(world)
+        colors_by_type = self._colors_by_type(world.creatures)
         total = sum(n for _, n in pop)
         max_pop = max(n for _, n in pop) if pop else 1
         bar_max_w = sw - 100
 
         for ctype, count in pop:
-            color = self._display_color(ctype, colors_by_type)
+            color = colors_by_type.get(ctype, DEFAULT_CREATURE_COLOR)
             pygame.draw.rect(self.screen, color, (sx + 10, y + 3, 10, 10))
             if ctype == LEARNING_CREATURE_TYPE:
                 pygame.draw.rect(self.screen, LEARNING_HIGHLIGHT_COLOR, (sx + 8, y + 1, sw - 16, 24), 1)

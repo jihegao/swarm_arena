@@ -48,6 +48,14 @@ class StationaryCreature(Creature):
         return Action(0.0, 0.0)
 
 
+class CustomColorCreature(Creature):
+    def __init__(self, x: float, y: float):
+        super().__init__(x, y, "CustomColorCreature", (12, 34, 56))
+
+    def decide(self, perception: Perception) -> Action:
+        return Action(0.0, 0.0)
+
+
 class SimulationSafetyTests(unittest.TestCase):
     def setUp(self):
         Creature._next_id = 0
@@ -168,6 +176,22 @@ class SimulationSafetyTests(unittest.TestCase):
 
         self.assertEqual(["One", "Two"], [cls.__name__ for cls in classes])
         self.assertIn("many.py exports multiple Creature classes", stdout.getvalue())
+
+    def test_sidebar_leaderboard_uses_runtime_creature_color(self):
+        import pygame
+
+        pygame.font.init()
+        world = World(160, 160)
+        creature = CustomColorCreature(80, 80)
+        world.creatures = [creature]
+
+        screen = pygame.Surface((420, 260))
+        renderer = Renderer(screen, sidebar_width=180)
+        renderer._draw_sidebar(world)
+
+        sx = renderer.world_area_width
+        self.assertEqual(creature.color, screen.get_at((sx + 12, 48))[:3])
+        self.assertEqual(creature.color, screen.get_at((sx + 7, 138))[:3])
 
 
 if __name__ == "__main__":
