@@ -10,7 +10,6 @@ from config import (
     GAME_OVER_COLOR,
     FOOD_COLOR,
     DEFAULT_CREATURE_COLOR,
-    CREATURE_COLORS,
     GAME_OVER_TICK,
     SIDEBAR_WIDTH,
 )
@@ -57,6 +56,13 @@ class Renderer:
             tip_y = int(c.y + math.sin(c.angle) * dir_len)
             pygame.draw.line(self.screen, (255, 255, 255), (int(c.x), int(c.y)), (tip_x, tip_y), 1)
 
+    def _colors_by_type(self, creatures: list[Creature]) -> dict[str, tuple[int, int, int]]:
+        colors: dict[str, tuple[int, int, int]] = {}
+        for c in creatures:
+            if c.is_alive and c.creature_type not in colors:
+                colors[c.creature_type] = c.color
+        return colors
+
     def _draw_hud(self, world: World):
         counts = world.alive_count_by_type()
         parts = [f"{t}: {n}" for t, n in sorted(counts.items())]
@@ -93,12 +99,13 @@ class Renderer:
         y += 6
 
         pop = world.population_ranking()
+        colors_by_type = self._colors_by_type(world.creatures)
         total = sum(n for _, n in pop)
         max_pop = max(n for _, n in pop) if pop else 1
         bar_max_w = sw - 100
 
         for ctype, count in pop:
-            color = CREATURE_COLORS.get(ctype, DEFAULT_CREATURE_COLOR)
+            color = colors_by_type.get(ctype, DEFAULT_CREATURE_COLOR)
             pygame.draw.rect(self.screen, color, (sx + 10, y + 3, 10, 10))
             label = self.row_font.render(f"{ctype}", True, (200, 200, 200))
             self.screen.blit(label, (sx + 24, y))
@@ -125,7 +132,7 @@ class Renderer:
 
         top = world.top_creatures(limit=12)
         for rank, (name, ctype, energy, size) in enumerate(top, 1):
-            color = CREATURE_COLORS.get(ctype, DEFAULT_CREATURE_COLOR)
+            color = colors_by_type.get(ctype, DEFAULT_CREATURE_COLOR)
             pygame.draw.rect(self.screen, color, (sx + 6, y + 2, 4, 14))
 
             display_name = name[:14]

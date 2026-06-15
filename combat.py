@@ -20,7 +20,9 @@ def try_eat(eater: Creature, target: Creature) -> bool:
         return False
 
     dist = eater.distance_to(target.x, target.y)
-    eat_range = (eater.size + target.size) * EAT_OVERLAP_RATIO
+    overlap_range = (eater.size + target.size) * EAT_OVERLAP_RATIO
+    containment_range = eater.size - target.size
+    eat_range = max(overlap_range, containment_range)
     if dist > eat_range:
         return False
 
