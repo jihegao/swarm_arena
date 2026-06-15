@@ -123,7 +123,7 @@ def train_ga(args: argparse.Namespace) -> int:
         height=args.height,
         seed=args.seed,
     )
-    status_window = PygameStatusWindow()
+    status_window = PygameStatusWindow(target_creature_type=creature_cls.__name__)
     trainer = GeneticTrainer(
         creature_cls,
         config,

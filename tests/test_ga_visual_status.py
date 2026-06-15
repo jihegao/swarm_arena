@@ -6,7 +6,12 @@ from config import SCREEN_HEIGHT, SCREEN_WIDTH, SIDEBAR_WIDTH
 from creature import Action, Perception
 from evolvable import EvolvableCreature
 from trainer import evaluate_genes
-from training.visual_status import PygameStatusWindow, ga_status_from_progress
+from world import World
+from training.visual_status import (
+    PygameStatusWindow,
+    ga_best_metric_from_progress,
+    ga_status_from_progress,
+)
 
 
 class TinyEvolvableCreature(EvolvableCreature):
@@ -29,6 +34,10 @@ class GAVisualStatusTests(unittest.TestCase):
         self.assertEqual("GA Training", status.title)
         self.assertEqual("Generation 3 / 20", status.primary)
         self.assertIn("best=12.345", status.secondary)
+        self.assertEqual(
+            "Best fitness: 12.345",
+            ga_best_metric_from_progress("Generation 003/020: best=12.345 avg=6.789 overall_best=12.345"),
+        )
 
     def test_evaluation_progress_shows_current_generation(self):
         status = ga_status_from_progress("Evaluating generation 004/020 (30 genomes)")
@@ -40,6 +49,19 @@ class GAVisualStatusTests(unittest.TestCase):
     def test_status_window_defaults_to_normal_simulation_size(self):
         self.assertEqual(SCREEN_WIDTH + SIDEBAR_WIDTH, PygameStatusWindow.default_width)
         self.assertEqual(SCREEN_HEIGHT, PygameStatusWindow.default_height)
+
+    def test_status_window_identifies_target_creatures_for_highlight(self):
+        world = World(80, 80)
+        target = TinyEvolvableCreature(20, 20, genes={"speed": 0.75})
+        other = TinyEvolvableCreature(40, 40, genes={"speed": 0.75})
+        other.creature_type = "OtherCreature"
+        world.creatures = [target, other]
+        window = PygameStatusWindow.__new__(PygameStatusWindow)
+        window.target_creature_type = "TinyEvolvableCreature"
+
+        highlighted = window._target_creatures(world)
+
+        self.assertEqual([target], highlighted)
 
     def test_evaluate_genes_sends_world_frames_to_visual_callback(self):
         seen_ticks: list[int] = []
