@@ -93,6 +93,10 @@ training with a visual before/after check of the creature behavior whenever
 possible. Do not send GA or RL training to the background by default. Before
 starting a long GA or RL run, tell the student:
 "训练会以前台可视化方式运行；如果希望加快进度，可以转为后台并行执行。"
+After visual training starts, remind the student once that they can stop the
+visual run and continue with a faster background experiment if they only need
+more samples. If the student stops or interrupts visual training, say:
+"已停止可视化训练；如果希望继续加速实验，可以转为后台并行执行。"
 Use background training only if the student explicitly asks to continue other
 work while training runs.
 
@@ -135,6 +139,11 @@ parameters.
    python3 train.py --method ga --creature creatures/<student_creature>.py --generations 20 --history-output ga_history.json --output best_params.json
    ```
 
+   After GA visual training starts, remind the student that they can stop the
+   visible run and continue as a faster background experiment. If they stop it,
+   offer to rerun GA in the background with the same creature and generation
+   settings.
+
 4. Open or summarize `best_params.json` and, if written, `ga_history.json`.
    Explain which parameters changed and connect them to the student's original
    observation.
@@ -175,6 +184,11 @@ such as seeking food, fleeing threats, chasing prey, wandering, or reproducing.
    ```bash
    python3 train.py --method rl --episodes 200 --output best_policy.json
    ```
+
+   After RL visual training starts, remind the student that every episode is
+   being rendered and that they can stop the visual run and continue faster in
+   the background. If they stop it, offer to rerun RL with
+   `--no-visualize-episodes` using the same episode count and output path.
 
 4. Inspect `best_policy.json` with the student. Focus on the learned action
    pattern, not raw table size. Translate the useful idea into plain language:
