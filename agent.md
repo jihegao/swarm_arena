@@ -88,8 +88,10 @@ asks for background execution, batch comparison, or non-visual evidence.
 For GA and RL work, default to an observable training process. Keep progress
 visible in the local session, and pair training with a visual before/after check
 of the creature behavior whenever possible. Do not send GA or RL training to the
-background by default. Use background training only if the student explicitly
-asks to continue other work while training runs.
+background by default. Before starting a long GA or RL run, tell the student:
+"训练会以前台可视化方式运行；如果希望加快进度，可以转为后台并行执行。"
+Use background training only if the student explicitly asks to continue other
+work while training runs.
 
 Use these classroom methods for visual GA and visual RL. "Visual" means the
 student can see the baseline behavior, watch foreground training progress, and
@@ -116,8 +118,10 @@ parameters.
    that this is a setup step and ask before modifying the student's creature
    file.
 
-3. Run GA in the foreground so the student sees generation-by-generation
-   progress:
+3. Before launching GA, remind the student that foreground progress is the
+   default visual training mode and that they can ask to switch to background
+   parallel execution if they want to move faster. Then run GA in the foreground
+   so the student sees generation-by-generation progress:
 
    ```bash
    python3 train.py --method ga --creature creatures/<student_creature>.py --generations 20 --history-output ga_history.json --output best_params.json
@@ -155,7 +159,10 @@ such as seeking food, fleeing threats, chasing prey, wandering, or reproducing.
    `LearningCreature` policy as a strategy experiment. It does not directly
    rewrite an arbitrary student creature.
 
-3. Run RL in the foreground so episode progress is visible:
+3. Before launching RL, remind the student that foreground progress is the
+   default visual training mode and that they can ask to switch to background
+   parallel execution if they want to move faster. Then run RL in the foreground
+   so episode progress is visible:
 
    ```bash
    python3 train.py --method rl --episodes 200 --output best_policy.json
