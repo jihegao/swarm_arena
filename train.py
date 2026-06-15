@@ -123,14 +123,17 @@ def train_ga(args: argparse.Namespace) -> int:
         height=args.height,
         seed=args.seed,
     )
-    trainer = GeneticTrainer(creature_cls, config)
+    status_window = PygameStatusWindow()
+    trainer = GeneticTrainer(
+        creature_cls,
+        config,
+        visual_frame_callback=status_window.render_world,
+    )
     print(
         f"Training {creature_cls.__name__}: "
         f"method=ga generations={config.generations} population={config.population_size}",
         flush=True,
     )
-    status_window = PygameStatusWindow()
-
     def show_progress(message: str):
         print(message, flush=True)
         status = ga_status_from_progress(message)
