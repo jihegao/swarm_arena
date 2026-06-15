@@ -26,7 +26,7 @@ python train.py --method ga --creature creatures/apex.py --generations 20
 python train.py --method rl --episodes 200 --output best_policy.json
 ```
 
-GA 输出 `best_params.json`，RL 输出 `best_policy.json`。GEP 规则生成仍在设计文档阶段，当前 `train.py` 暂不支持 `--method gep`。
+GA 输出 `best_params.json`，RL 输出 `best_policy.json`。RL 默认会用 pygame 可视化每个 episode；如果希望加快训练或后台运行，可加 `--no-visualize-episodes`。GEP 规则生成仍在设计文档阶段，当前 `train.py` 暂不支持 `--method gep`。
 
 ### 操作
 

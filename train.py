@@ -81,6 +81,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epsilon", type=float, default=0.25)
     parser.add_argument("--epsilon-decay", type=float, default=0.995)
     parser.add_argument("--min-epsilon", type=float, default=0.03)
+    parser.add_argument(
+        "--visualize-episodes",
+        dest="visualize_episodes",
+        action="store_true",
+        default=True,
+        help="Render each RL episode in a pygame window. Default for classroom use.",
+    )
+    parser.add_argument(
+        "--no-visualize-episodes",
+        dest="visualize_episodes",
+        action="store_false",
+        help="Run RL episodes without pygame rendering for faster/background training.",
+    )
+    parser.add_argument("--visual-fps", type=int, default=60)
     return parser.parse_args()
 
 
@@ -142,6 +156,8 @@ def train_rl(args: argparse.Namespace) -> int:
         width=args.width,
         height=args.height,
         seed=args.seed,
+        visualize_episodes=args.visualize_episodes,
+        visual_fps=args.visual_fps,
     )
     trainer = RLTrainer(config)
     print(
