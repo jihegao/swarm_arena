@@ -368,7 +368,7 @@ class World:
         counts = self.alive_count_by_type()
         return sorted(counts.items(), key=lambda x: x[1], reverse=True)
 
-    def top_creatures(self, limit: int = 10) -> list[tuple[str, str, float, float]]:
+    def top_creatures(self, limit: int = 10) -> list[tuple[str, str, float, float, tuple[int, int, int]]]:
         alive = sorted(
             [c for c in self.creatures if c.is_alive],
             key=lambda c: c.energy,
@@ -376,5 +376,5 @@ class World:
         )
         result = []
         for c in alive[:limit]:
-            result.append((c.name, c.creature_type, c.energy, c.size))
+            result.append((c.name, c.creature_type, c.energy, c.size, c.color))
         return result

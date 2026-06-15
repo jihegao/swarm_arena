@@ -10,6 +10,7 @@ from contextlib import redirect_stdout
 
 from creature import Action, Creature, Perception
 from food import Food
+from renderer import Renderer
 from world import World
 
 
@@ -42,6 +43,14 @@ class BadActionCreature(Creature):
 class StationaryCreature(Creature):
     def __init__(self, x: float, y: float):
         super().__init__(x, y, "StationaryCreature", (200, 200, 30))
+
+    def decide(self, perception: Perception) -> Action:
+        return Action(0.0, 0.0)
+
+
+class CustomColorCreature(Creature):
+    def __init__(self, x: float, y: float):
+        super().__init__(x, y, "CustomColorCreature", (12, 34, 56))
 
     def decide(self, perception: Perception) -> Action:
         return Action(0.0, 0.0)
@@ -115,6 +124,29 @@ class SimulationSafetyTests(unittest.TestCase):
         self.assertTrue(food.depleted)
         self.assertGreater(eater.energy, 40.0)
 
+    def test_top_creatures_reports_actual_creature_color(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
+
+        top = world.top_creatures(limit=1)
+
+        self.assertEqual((12, 34, 56), top[0][4])
+
+    def test_renderer_uses_alive_creature_color_for_sidebar_type(self):
+        world = World(160, 160)
+        creature = StationaryCreature(80, 80)
+        creature.creature_type = "CustomType"
+        creature.color = (12, 34, 56)
+        world.creatures = [creature]
+        renderer = Renderer.__new__(Renderer)
+
+        colors = renderer._alive_color_by_type(world)
+
+        self.assertEqual((12, 34, 56), renderer._display_color("CustomType", colors))
+
     def test_loader_warns_when_file_exports_multiple_creature_classes(self):
         from creature_loader import load_creatures
 
@@ -144,6 +176,22 @@ class SimulationSafetyTests(unittest.TestCase):
 
         self.assertEqual(["One", "Two"], [cls.__name__ for cls in classes])
         self.assertIn("many.py exports multiple Creature classes", stdout.getvalue())
+
+    def test_sidebar_leaderboard_uses_runtime_creature_color(self):
+        import pygame
+
+        pygame.font.init()
+        world = World(160, 160)
+        creature = CustomColorCreature(80, 80)
+        world.creatures = [creature]
+
+        screen = pygame.Surface((420, 260))
+        renderer = Renderer(screen, sidebar_width=180)
+        renderer._draw_sidebar(world)
+
+        sx = renderer.world_area_width
+        self.assertEqual(creature.color, screen.get_at((sx + 12, 48))[:3])
+        self.assertEqual(creature.color, screen.get_at((sx + 7, 138))[:3])
 
 
 if __name__ == "__main__":

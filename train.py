@@ -9,6 +9,7 @@ import sys
 from evolvable import EvolvableCreature
 from trainer import GAConfig, GeneticTrainer
 from training.rl import RLConfig, RLTrainer, save_rl_result
+from training.visual_status import PygameStatusWindow, ga_status_from_progress
 
 
 def load_evolvable_class(
@@ -81,6 +82,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epsilon", type=float, default=0.25)
     parser.add_argument("--epsilon-decay", type=float, default=0.995)
     parser.add_argument("--min-epsilon", type=float, default=0.03)
+    parser.add_argument(
+        "--visualize-episodes",
+        dest="visualize_episodes",
+        action="store_true",
+        default=True,
+        help="Render each RL episode in a pygame window. Default for classroom use.",
+    )
+    parser.add_argument(
+        "--no-visualize-episodes",
+        dest="visualize_episodes",
+        action="store_false",
+        help="Run RL episodes without pygame rendering for faster/background training.",
+    )
+    parser.add_argument("--visual-fps", type=int, default=60)
     return parser.parse_args()
 
 
@@ -108,13 +123,27 @@ def train_ga(args: argparse.Namespace) -> int:
         height=args.height,
         seed=args.seed,
     )
-    trainer = GeneticTrainer(creature_cls, config)
+    status_window = PygameStatusWindow(target_creature_type=creature_cls.__name__)
+    trainer = GeneticTrainer(
+        creature_cls,
+        config,
+        visual_frame_callback=status_window.render_world,
+    )
     print(
         f"Training {creature_cls.__name__}: "
         f"method=ga generations={config.generations} population={config.population_size}",
         flush=True,
     )
-    result = trainer.train(lambda message: print(message, flush=True))
+    def show_progress(message: str):
+        print(message, flush=True)
+        status = ga_status_from_progress(message)
+        if status is not None:
+            status_window.update(status)
+
+    try:
+        result = trainer.train(show_progress)
+    finally:
+        status_window.close()
 
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(result.best_genes, f, indent=2, sort_keys=True)
@@ -142,6 +171,8 @@ def train_rl(args: argparse.Namespace) -> int:
         width=args.width,
         height=args.height,
         seed=args.seed,
+        visualize_episodes=args.visualize_episodes,
+        visual_fps=args.visual_fps,
     )
     trainer = RLTrainer(config)
     print(

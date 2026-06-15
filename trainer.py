@@ -15,6 +15,7 @@ from world import World
 
 FitnessFn = Callable[[dict[str, float]], float]
 ProgressFn = Callable[[str], None]
+VisualFrameFn = Callable[[World], bool]
 
 
 @dataclass(frozen=True)
@@ -84,6 +85,7 @@ def evaluate_genes(
     width: int = SCREEN_WIDTH,
     height: int = SCREEN_HEIGHT,
     quiet_opponent_warnings: bool = True,
+    visual_frame_callback: VisualFrameFn | None = None,
 ) -> float:
     fixed_cls = make_fixed_gene_class(creature_cls, genes)
     if opponent_classes is None:
@@ -114,6 +116,9 @@ def evaluate_genes(
         if target_alive:
             last_alive_tick = world.tick
         world.update()
+        if visual_frame_callback is not None and not visual_frame_callback(world):
+            world.game_over = True
+            break
 
     survivors = [
         c for c in world.creatures
@@ -133,6 +138,7 @@ class GeneticTrainer:
         config: GAConfig | None = None,
         opponent_classes: list[type[Creature]] | None = None,
         fitness_fn: FitnessFn | None = None,
+        visual_frame_callback: VisualFrameFn | None = None,
     ):
         if not issubclass(creature_cls, EvolvableCreature):
             raise TypeError("creature_cls must inherit from EvolvableCreature")
@@ -143,6 +149,7 @@ class GeneticTrainer:
         self.config = config or GAConfig()
         self.opponent_classes = opponent_classes
         self.fitness_fn = fitness_fn or self._evaluate
+        self.visual_frame_callback = visual_frame_callback
         if self.config.seed is not None:
             random.seed(self.config.seed)
 
@@ -201,6 +208,7 @@ class GeneticTrainer:
             width=self.config.width,
             height=self.config.height,
             quiet_opponent_warnings=self.config.quiet_opponent_warnings,
+            visual_frame_callback=self.visual_frame_callback,
         )
 
     def _next_generation(
