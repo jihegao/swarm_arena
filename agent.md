@@ -59,19 +59,35 @@ the student's environment.
 
 ## Startup, Run, And Training Rules
 
-At the start of a classroom session, check whether the local Python and pygame
-environment is ready before asking the student to run or train anything.
+At the start of a classroom session, use the repository-local virtual
+environment first. The expected interpreter is `.venv/bin/python`. Do not use a
+global Python environment for classroom runs or training unless the teacher
+explicitly asks for it.
+
+If `.venv/bin/python` is missing, create it before asking the student to run or
+train anything:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip pygame pytest
+```
+
+Then check whether the local Python and pygame environment is ready.
 
 Use lightweight checks such as:
 
 ```bash
-python3 --version
-python3 -c "import pygame; print(pygame.version.ver)"
+.venv/bin/python --version
+.venv/bin/python -c "import pygame; print(pygame.version.ver)"
 ```
 
 If Python or pygame is missing, pause the practice flow and guide the student or
 teacher through environment setup before changing creature code. Do not let a
 missing runtime look like a failed creature design.
+
+Use `python3` directly only when that is the active local convention in the
+student's environment or the teacher asks to bypass the repository-local
+virtual environment.
 
 When the student says "运行", "run it", "start", or asks to see the creature in
 action, run the project locally instead of only describing the command. Prefer
