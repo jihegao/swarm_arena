@@ -3,725 +3,339 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>竞争生存游戏 - 教学课件</title>
+<title>Swarm Arena Developer Courseware / 开发者课件</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1117; color: #e6edf3; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
-
-.slide-container { width: 100%; height: 100%; position: relative; }
-.slide { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; padding: 60px 100px; overflow-y: auto; }
-.slide.active { display: flex; }
-
-h1 { font-size: 3.2em; margin-bottom: 20px; line-height: 1.2; }
-h2 { font-size: 2.2em; margin-bottom: 30px; color: #58a6ff; border-bottom: 2px solid #21262d; padding-bottom: 12px; }
-h3 { font-size: 1.4em; margin: 20px 0 10px; color: #79c0ff; }
-p, li { font-size: 1.25em; line-height: 1.7; color: #c9d1d9; }
-ul, ol { margin: 12px 0 12px 28px; }
-li { margin-bottom: 6px; }
-
-.subtitle { font-size: 1.5em; color: #8b949e; margin-bottom: 40px; }
-.hero-icon { font-size: 5em; margin-bottom: 20px; }
-.highlight { color: #f0883e; font-weight: bold; }
-.code-inline { background: #161b22; padding: 2px 8px; border-radius: 4px; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.85em; color: #79c0ff; }
-
-pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 14px 0; overflow-x: auto; }
-pre code { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82em; line-height: 1.6; }
-.kw { color: #ff7b72; }
-.fn { color: #d2a8ff; }
-.str { color: #a5d6ff; }
-.cm { color: #8b949e; }
-.num { color: #79c0ff; }
-.tp { color: #ffa657; }
-.var { color: #e6edf3; }
-.op { color: #ff7b72; }
-
-table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95em; }
-th { background: #161b22; color: #58a6ff; padding: 10px 16px; text-align: left; border: 1px solid #30363d; }
-td { padding: 9px 16px; border: 1px solid #21262d; color: #c9d1d9; }
-tr:nth-child(even) td { background: #0d1117; }
-tr:nth-child(odd) td { background: #161b22; }
-
-.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
-.card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
-.card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; }
-.card-desc { font-size: 0.95em; color: #8b949e; line-height: 1.5; }
-.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 6px; }
-
-.tip-box { background: #1c2128; border-left: 4px solid #f0883e; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
-.tip-box p { color: #e6edf3; font-size: 1.05em; }
-
-.screenshot-placeholder {
-  background: #161b22;
-  border: 2px dashed #30363d;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #484f58;
-  font-size: 0.95em;
-  position: relative;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
-.screenshot-placeholder .screenshot-icon { font-size: 2em; margin-bottom: 8px; }
-.screenshot-placeholder .screenshot-label { font-size: 0.9em; color: #8b949e; }
-.screenshot-placeholder img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-
-.step-number {
-  display: inline-flex;
-  align-items: center;
+.deck { position: relative; width: 100%; height: 100%; }
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
   justify-content: center;
-  width: 36px; height: 36px;
-  background: #58a6ff;
-  color: #0d1117;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 1.1em;
-  margin-right: 12px;
-  flex-shrink: 0;
+  gap: 22px;
+  padding: 58px 88px 84px;
+  overflow-y: auto;
 }
-.step-row { display: flex; align-items: center; margin-bottom: 10px; }
-.step-row p { margin: 0; font-size: 1.1em; }
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.method-flow { display: grid; grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr; gap: 10px; align-items: stretch; margin: 18px 0; }
-.flow-node { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; min-height: 104px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-.flow-node strong { color: #79c0ff; font-size: 1.05em; margin-bottom: 6px; }
-.flow-node span { color: #8b949e; font-size: 0.92em; line-height: 1.45; }
-.flow-arrow { display: flex; align-items: center; justify-content: center; color: #f0883e; font-size: 1.6em; font-weight: bold; }
-.gene-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.gene-pill { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 8px 10px; color: #c9d1d9; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.88em; }
-.q-table { display: grid; grid-template-columns: 1fr repeat(3, 0.85fr); border: 1px solid #30363d; border-radius: 8px; overflow: hidden; margin-top: 12px; }
-.q-cell { padding: 10px; border-right: 1px solid #30363d; border-bottom: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 0.92em; }
-.q-cell:nth-child(4n) { border-right: 0; }
-.q-head { background: #21262d; color: #79c0ff; font-weight: bold; }
-.q-best { color: #3fb950; font-weight: bold; }
-
-.nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 100; }
-.nav button { background: #21262d; border: 1px solid #30363d; color: #e6edf3; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2em; cursor: pointer; transition: all 0.2s; }
-.nav button:hover { background: #30363d; }
-.page-num { color: #8b949e; font-size: 0.95em; min-width: 80px; text-align: center; }
-
-.progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #58a6ff, #bc8cff); transition: width 0.3s; z-index: 100; }
-
+.slide.active { display: flex; }
+.eyebrow { color: #f0883e; font-size: 0.92rem; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+h1 { max-width: 980px; font-size: 3.2rem; line-height: 1.08; letter-spacing: 0; }
+h2 { color: #79c0ff; font-size: 2.25rem; line-height: 1.18; letter-spacing: 0; }
+h3 { color: #ffa657; font-size: 1.1rem; margin-bottom: 8px; letter-spacing: 0; }
+p, li { color: #c9d1d9; font-size: 1.08rem; line-height: 1.58; }
+ul, ol { margin-left: 22px; }
+li { margin: 5px 0; }
+code, .code {
+  color: #a5d6ff;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-family: "SF Mono", "Fira Code", Consolas, monospace;
+  font-size: 0.92em;
+}
+pre {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 16px 18px;
+  overflow-x: auto;
+}
+pre code { border: 0; padding: 0; background: transparent; color: #e6edf3; font-size: 0.86rem; line-height: 1.55; }
+.lead { max-width: 980px; color: #8b949e; font-size: 1.28rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.panel {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 18px;
+}
+.panel p { font-size: 0.98rem; color: #8b949e; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { border: 1px solid #30363d; padding: 9px 11px; text-align: left; vertical-align: top; }
+th { color: #79c0ff; background: #161b22; }
+td { color: #c9d1d9; background: #0d1117; }
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.step { border-left: 4px solid #58a6ff; background: #161b22; padding: 16px; border-radius: 8px; min-height: 126px; }
+.step strong { display: block; color: #e6edf3; margin-bottom: 8px; }
+.step span { color: #8b949e; line-height: 1.45; }
+.note { border-left: 4px solid #f0883e; background: #1c2128; border-radius: 0 8px 8px 0; padding: 14px 18px; }
+.note p { color: #e6edf3; font-size: 1rem; }
+.nav {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 10;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.nav button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 1.05rem;
+}
+.page { min-width: 84px; color: #8b949e; text-align: center; }
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: #58a6ff; z-index: 20; transition: width 0.2s; }
 @media (max-width: 900px) {
-  .slide { padding: 30px 24px; }
-  h1 { font-size: 2.2em; }
-  h2 { font-size: 1.6em; }
-  p, li { font-size: 1em; }
-  .two-col { grid-template-columns: 1fr; }
-  .card-grid { grid-template-columns: 1fr; }
-  .method-flow { grid-template-columns: 1fr; }
-  .flow-arrow { transform: rotate(90deg); }
-  .q-table { grid-template-columns: 1fr; }
-  .q-cell, .q-cell:nth-child(4n) { border-right: 0; }
+  .slide { padding: 34px 22px 78px; justify-content: flex-start; }
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.7rem; }
+  .grid, .grid.three, .split, .flow { grid-template-columns: 1fr; }
+  p, li { font-size: 1rem; }
 }
 </style>
 </head>
 <body>
 <div class="progress" id="progress"></div>
+<main class="deck" id="deck">
 
-<div class="slide-container" id="slides">
-
-<!-- Slide 1: Cover -->
-<div class="slide active" data-index="0">
-  <div class="hero-icon">&#x1F3AE;</div>
-  <h1>竞争生存游戏</h1>
-  <p class="subtitle">Competitive Survival — 观察、选择路线、验证，再发布你的生物</p>
-  <p style="font-size:1.1em; color:#8b949e; max-width:700px;">
-    在 2D 世界中，你设计的生物将与其他生物竞争：抢食物、吃对手、繁殖后代。<br>
-    本节课的目标是完成一次小实验：<span class="highlight">观察现象 → 选择技术路线 → 验证改动 → 署名发布。</span>
-  </p>
-  <div style="margin-top:40px; display:flex; gap:24px;">
-    <div class="card" style="text-align:center; min-width:120px;">
-      <div style="font-size:2em;">&#x1F40D;</div>
-      <div class="card-title" style="color:#ff7b72;">Hunter</div>
-    </div>
-    <div class="card" style="text-align:center; min-width:120px;">
-      <div style="font-size:2em;">&#x1F42C;</div>
-      <div class="card-title" style="color:#3fb950;">Grazer</div>
-    </div>
-    <div class="card" style="text-align:center; min-width:120px;">
-      <div style="font-size:2em;">&#x1F435;</div>
-      <div class="card-title" style="color:#58a6ff;">PackHunter</div>
-    </div>
-    <div class="card" style="text-align:center; min-width:120px;">
-      <div style="font-size:2em;">&#x1F409;</div>
-      <div class="card-title" style="color:#d29922;">Scavenger</div>
-    </div>
+<section class="slide active">
+  <div class="eyebrow">Swarm Arena / 竞争生存仿真</div>
+  <h1>Developer courseware for building, testing, and publishing arena agents</h1>
+  <p class="lead">面向开发者的双语工程课件：理解仿真边界、Creature API、训练流程、验证方式和 GitHub 发布路径。</p>
+  <div class="grid three">
+    <div class="panel"><h3>Simulation</h3><p>2D world, food, species, eating, reproduction, scoring, and visible runs.</p></div>
+    <div class="panel"><h3>Agents</h3><p>Creatures implement <code>decide(perception)</code> and return sanitized <code>Action</code> objects.</p></div>
+    <div class="panel"><h3>Training</h3><p>GA tunes numbers; Q-learning explores high-level action policy.</p></div>
   </div>
-</div>
+</section>
 
-<!-- Slide 2: Game Goal -->
-<div class="slide" data-index="1">
-  <h2>&#x1F3AF; 游戏目标</h2>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title">&#x23F1; 时间限制</div>
-      <div class="card-desc">游戏在 <span class="highlight">5000 tick</span> 后结束（或只剩一种生物时提前结束）。</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F3C6; 胜利条件</div>
-      <div class="card-desc">存活数量最多的物种中，能量最高的个体获胜。</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F981; 核心玩法</div>
-      <div class="card-desc">抢食物 → 长大 → 吃掉比自己小的对手 → 繁殖后代 → 数量碾压。</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F4CA; 计分规则</div>
-      <div class="card-desc">吃掉对手 +对手max_energy | 吃食物 +amount | 繁殖 +100 | 最终获胜 +500</div>
-    </div>
-  </div>
-  <div class="tip-box">
-    <p><span class="highlight">关键思路</span>：这是一个滚雪球游戏。前期抢到食物 → 体型变大 → 能吃更多对手 → 获得更多能量 → 繁殖更多后代。起步很关键！</p>
-  </div>
-</div>
-
-<!-- Slide 3: Quick Start -->
-<div class="slide" data-index="2">
-  <h2>&#x1F680; 快速开始</h2>
-  <div class="two-col">
-    <div>
-      <h3>运行游戏</h3>
-      <pre><code><span class="kw">python3</span> main.py</code></pre>
-      <h3>操作按键</h3>
-      <table>
-        <tr><th>按键</th><th>功能</th></tr>
-        <tr><td><span class="code-inline">SPACE</span></td><td>暂停 / 继续</td></tr>
-        <tr><td><span class="code-inline">R</span></td><td>重新开始</td></tr>
-        <tr><td><span class="code-inline">ESC</span></td><td>退出</td></tr>
-      </table>
-    </div>
-    <div>
-      <h3>课堂入口</h3>
-      <p>先观察一个已有行为，再选择规则、GA 或 Q-learning 路线。AI 助手应先读取 <span class="code-inline">agent.md</span>，引导你说出现象，而不是直接替你写完整生物。</p>
-      <div class="tip-box" style="margin-top:20px;">
-        <p>本节课只做一个聚焦改动：能讲清楚、能复现、能署名。</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Slide 4: Exploration Flow -->
-<div class="slide" data-index="3">
-  <h2>&#x1F4CB; 课堂实验探索流程</h2>
-  <div class="two-col">
-    <div>
-      <div class="step-row"><span class="step-number">1</span><p>观察现象</p></div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">先看，不急着写</div>
-        <div class="card-desc">运行 <span class="code-inline">python3 main.py</span>，说清楚你观察了哪种生物、发生了什么、你猜原因是什么、怎样算改进。</div>
-      </div>
-
-      <div class="step-row"><span class="step-number">2</span><p>选择技术路线</p></div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">规则 / GA / Q-learning</div>
-        <div class="card-desc">只选一条路线：写一条可解释规则，调一组参数，或用 RL 探索高层动作取舍。</div>
-      </div>
-    </div>
-    <div>
-      <div class="step-row"><span class="step-number">3</span><p>优化并验证</p></div>
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">一次只改一个点</div>
-        <div class="card-desc">记录“现象、假设、本轮改动、验证方式、观察结果、下一轮建议”。变差也算证据。</div>
-      </div>
-
-      <div class="step-row"><span class="step-number">4</span><p>发布署名</p></div>
-      <div class="card" style="margin-bottom:0;">
-        <div class="card-title">让别人能复现</div>
-        <div class="card-desc">最终文件要有唯一生物名、学生作者、路线、验证说明，以及可重复的运行或训练方式。</div>
-      </div>
-    </div>
-  </div>
-  <div class="tip-box">
-    <p>AI 助手的任务是做课堂教练：一次问一个问题，保留学生自己的观察、选择、命名和署名。</p>
-  </div>
-</div>
-
-<!-- Slide 5: Your Task -->
-<div class="slide" data-index="4">
-  <h2>&#x1F4DD; 你的任务</h2>
-  <p style="margin-bottom:20px;">在完成观察和路线选择后，再创建自己的文件。规则路线的核心是两件事：<span class="highlight">创建类</span> 和 <span class="highlight">实现 decide()</span>。</p>
-  <h3>最小模板</h3>
-  <pre><code><span class="kw">from</span> <span class="tp">__future__</span> <span class="kw">import</span> <span class="tp">annotations</span>
-<span class="kw">import</span> <span class="tp">math</span>, <span class="tp">os</span>, <span class="tp">sys</span>
-<span class="var">sys</span>.<span class="fn">path</span>.<span class="fn">insert</span>(<span class="num">0</span>, <span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">abspath</span>(<span class="var">__file__</span>))))
-<span class="kw">from</span> <span class="tp">creature</span> <span class="kw">import</span> <span class="tp">Creature</span>, <span class="tp">Perception</span>, <span class="tp">Action</span>
-
-<span class="cm"># Creature: MyCreature</span>
-<span class="cm"># Author: &lt;Student Name&gt;</span>
-<span class="cm"># Route: rule-based</span>
-<span class="cm"># Notes: baseline creature for the first observation</span>
-<span class="kw">class</span> <span class="tp">MyCreature</span>(<span class="tp">Creature</span>):
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>: <span class="tp">float</span>, <span class="var">y</span>: <span class="tp">float</span>):
-        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"MyCreature"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
-
-    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">perception</span>: <span class="tp">Perception</span>) -> <span class="tp">Action</span>:
-        <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">perception</span>.<span class="var">self_angle</span>, <span class="var">self</span>.<span class="var">max_speed</span>)</code></pre>
-  <div class="tip-box">
-    <p>这段代码创建了一个只会直线前进的橙色生物。先运行观察，再把一条明确假设改进进去。</p>
-  </div>
-</div>
-
-<!-- Slide 6: Perception -->
-<div class="slide" data-index="5">
-  <h2>&#x1F441; Perception — 你能看到什么</h2>
-  <p style="margin-bottom:16px;">每一帧，游戏引擎调用 <span class="code-inline">decide(perception)</span>，传入感知信息：</p>
+<section class="slide">
+  <h2>1. Repository map / 仓库地图</h2>
   <table>
-    <tr><th>字段</th><th>类型</th><th>说明</th></tr>
-    <tr><td><span class="code-inline">self_x / self_y</span></td><td>float</td><td>你的坐标</td></tr>
-    <tr><td><span class="code-inline">self_angle</span></td><td>float</td><td>你的朝向（弧度，0=右，pi/2=下）</td></tr>
-    <tr><td><span class="code-inline">self_size</span></td><td>float</td><td>你的体型大小（随能量动态变化）</td></tr>
-    <tr><td><span class="code-inline">self_energy</span></td><td>float</td><td>你的能量值</td></tr>
-    <tr><td><span class="code-inline">self_max_energy</span></td><td>float</td><td>你的初始能量值</td></tr>
-    <tr><td><span class="code-inline">world_width / height</span></td><td>int</td><td>世界尺寸</td></tr>
-    <tr><td><span class="code-inline">nearby_food</span></td><td>list[FoodSpot]</td><td>视野范围内的食物列表</td></tr>
-    <tr><td><span class="code-inline">nearby_creatures</span></td><td>list[CreatureSpot]</td><td>视野范围内的其他生物</td></tr>
+    <tr><th>Path</th><th>Developer role</th><th>中文说明</th></tr>
+    <tr><td><code>main.py</code></td><td>Visible simulation entry point.</td><td>可视化仿真入口。</td></tr>
+    <tr><td><code>world.py</code></td><td>Tick loop, spawning, eating, reproduction, scoring.</td><td>tick 循环、生成、进食、繁殖、计分。</td></tr>
+    <tr><td><code>creature.py</code></td><td>Core API: <code>Creature</code>, <code>Perception</code>, <code>Action</code>.</td><td>核心生物 API。</td></tr>
+    <tr><td><code>creatures/</code></td><td>Built-in and custom creature classes.</td><td>内置和自定义生物。</td></tr>
+    <tr><td><code>train.py</code></td><td>GA and RL training CLI.</td><td>GA/RL 训练命令。</td></tr>
+    <tr><td><code>training/</code></td><td>Evaluation, policy, RL, visual status helpers.</td><td>训练评估、策略和状态显示。</td></tr>
+    <tr><td><code>agent.md</code></td><td>AI classroom coach protocol.</td><td>AI 课堂教练协议。</td></tr>
   </table>
-  <div class="two-col" style="margin-top:12px;">
-    <div class="card">
-      <div class="card-title">FoodSpot</div>
-      <div class="card-desc"><span class="code-inline">x, y</span> 坐标 | <span class="code-inline">amount</span> 能量值 | <span class="code-inline">size</span> 大小</div>
-    </div>
-    <div class="card">
-      <div class="card-title">CreatureSpot</div>
-      <div class="card-desc"><span class="code-inline">x, y</span> 坐标 | <span class="code-inline">creature_type</span> 类型名 | <span class="code-inline">size</span> 体型 | <span class="code-inline">energy_pct</span> 能量百分比</div>
-    </div>
-  </div>
-  <div class="tip-box">
-    <p>你只能看到 <span class="code-inline">vision_radius</span> 范围内的东西，范围外的世界不可见！</p>
-  </div>
-</div>
+  <div class="note"><p>Keep README, courseware, and agent protocol aligned when the classroom workflow changes. 修改课堂流程时，README、课件和 agent 协议要同步。</p></div>
+</section>
 
-<!-- Slide 7: Action -->
-<div class="slide" data-index="6">
-  <h2>&#x1F3AF; Action — 你要做什么</h2>
-  <p style="margin-bottom:16px;">每帧返回一个 <span class="code-inline">Action</span> 对象：</p>
-  <pre><code><span class="fn">Action</span>(
-    <span class="var">target_angle</span>,       <span class="cm"># float: 这一帧要朝向的角度（弧度）</span>
-    <span class="var">target_speed</span>,       <span class="cm"># float: 这一帧的移动速度（不超过 max_speed）</span>
-    <span class="var">attack_target_id</span>,   <span class="cm"># int | None: 要追击的生物 ID（仅标记意图）</span>
-    <span class="var">reproduce</span>,          <span class="cm"># bool: 是否繁殖（默认 False）</span>
-)</code></pre>
-  <div class="card-grid" style="margin-top:20px;">
-    <div class="card">
-      <div class="card-title">&#x1F3C3; 移动</div>
-      <div class="card-desc">每帧必须指定 <span class="code-inline">target_angle</span> 和 <span class="code-inline">target_speed</span>。设 0 表示停止。</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x2694;&#xFE0F; 攻击</div>
-      <div class="card-desc">碰到比自己<span class="highlight">小</span>的生物会自动吃掉，无需主动声明攻击！</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F476; 繁殖</div>
-      <div class="card-desc">设 <span class="code-inline">reproduce=True</span> 且满足条件时，附近生成同类型子代。</div>
-    </div>
-  </div>
-  <div class="tip-box">
-    <p>战斗规则很简单：<span class="highlight">大吃小</span>。没有攻击力和防御力。你只需要移动到比你小的生物旁边就行！</p>
-  </div>
-</div>
-
-<!-- Slide 8: Attributes -->
-<div class="slide" data-index="7">
-  <h2>&#x2699;&#xFE0F; 属性系统与点数分配</h2>
-  <div class="two-col">
+<section class="slide">
+  <h2>2. Local runtime / 本地运行环境</h2>
+  <div class="split">
     <div>
-      <h3>可配置属性</h3>
-      <table>
-        <tr><th>属性</th><th>默认</th><th>最小</th><th>最大</th><th>说明</th></tr>
-        <tr><td>max_speed</td><td>1.0</td><td>0.5</td><td>4.0</td><td>最大移动速度</td></tr>
-        <tr><td>max_energy</td><td>100</td><td>30</td><td>200</td><td>初始能量值</td></tr>
-        <tr><td>vision_radius</td><td>20</td><td>50</td><td>300</td><td>视野半径</td></tr>
-      </table>
+      <h3>Preferred setup</h3>
+      <pre><code>python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip pygame pytest
+.venv/bin/python --version
+.venv/bin/python -c "import pygame; print(pygame.version.ver)"</code></pre>
     </div>
     <div>
-      <h3>点数预算 = 1.5</h3>
-      <pre><code><span class="cm"># 归一化值 = (值 - 最小) / (最大 - 最小)</span>
-<span class="cm"># 总点数 = 各属性归一化值之和</span>
-<span class="cm"># 超过 1.5 则等比例缩小</span>
+      <h3>Run and test</h3>
+      <pre><code>.venv/bin/python main.py
 
-<span class="cm"># 示例：Hunter 的分配</span>
-<span class="var">speed</span>  = (<span class="num">2.5</span> - <span class="num">0.5</span>) / (<span class="num">4.0</span> - <span class="num">0.5</span>) = <span class="num">0.57</span>
-<span class="var">energy</span> = (<span class="num">80</span>  - <span class="num">30</span>) / (<span class="num">200</span> - <span class="num">30</span>) = <span class="num">0.29</span>
-<span class="var">vision</span> = (<span class="num">200</span> - <span class="num">50</span>) / (<span class="num">300</span> - <span class="num">50</span>) = <span class="num">0.60</span>
-<span class="var">总计</span>   = <span class="num">1.46</span></code></pre>
+PYTHONPYCACHEPREFIX=/Users/gaojihe/apps/swarm_arena/.pycache_check \
+  .venv/bin/python -m pytest -q</code></pre>
     </div>
   </div>
-  <div class="tip-box">
-    <p><span class="highlight">速度最关键</span>：能吃到食物就能长大，长大就能吃别人，是滚雪球的核心！</p>
-  </div>
-</div>
+  <p>Use the repository-local interpreter unless a task explicitly asks for a different environment. 优先使用仓库本地解释器，除非任务明确要求其他环境。</p>
+</section>
 
-<!-- Slide 9: Eat Rules -->
-<div class="slide" data-index="8">
-  <h2>&#x1F356; 大吃小规则</h2>
-  <div class="two-col">
+<section class="slide">
+  <h2>3. Tick pipeline / Tick 流水线</h2>
+  <div class="flow">
+    <div class="step"><strong>1. Perceive</strong><span>World builds local, bounded perception. 世界构造局部感知。</span></div>
+    <div class="step"><strong>2. Decide</strong><span>Creature returns one action. 生物返回单帧动作。</span></div>
+    <div class="step"><strong>3. Sanitize</strong><span>Invalid values and exceptions are contained. 非法值和异常被隔离。</span></div>
+    <div class="step"><strong>4. Resolve</strong><span>Movement, energy, eating, reproduction, scoring. 解析移动、能量、进食、繁殖、计分。</span></div>
+  </div>
+  <div class="note"><p>The decision API does not expose full world state. 决策 API 不暴露完整世界状态。</p></div>
+</section>
+
+<section class="slide">
+  <h2>4. Creature contract / 生物实现契约</h2>
+  <div class="split">
     <div>
-      <h3>战斗规则</h3>
+      <h3>Required shape</h3>
       <ul>
-        <li>碰到比自己<span class="highlight">体型小</span>的生物，直接吃掉</li>
-        <li>获得对方<span class="highlight">全部剩余能量</span></li>
-        <li>碰撞范围：距离 &lt; (eater.size + target.size) &times; 0.6</li>
-        <li>吃掉后 10 帧冷却</li>
+        <li>Subclass <code>Creature</code> or <code>EvolvableCreature</code>.</li>
+        <li>Constructor signature: <code>__init__(self, x, y)</code>.</li>
+        <li>Implement <code>decide(self, perception)</code>.</li>
+        <li>Import without prompts or side effects.</li>
       </ul>
-      <h3>体型公式</h3>
-      <pre><code><span class="var">size</span> = <span class="num">6</span> &times; <span class="fn">sqrt</span>(<span class="var">energy</span> / <span class="num">100</span>)</code></pre>
     </div>
     <div>
-      <h3>能量与体型对照</h3>
-      <table>
-        <tr><th>能量</th><th>体型</th></tr>
-        <tr><td>50</td><td>4.2</td></tr>
-        <tr><td>100</td><td>6.0</td></tr>
-        <tr><td>200</td><td>8.5</td></tr>
-        <tr><td>500</td><td>13.4</td></tr>
-        <tr><td>1000</td><td>19.0</td></tr>
-        <tr><td>5000</td><td>42.4</td></tr>
-      </table>
-      <div class="tip-box">
-        <p>体型越大碰撞范围也越大，更容易被更大的生物碰到！</p>
-      </div>
+      <h3>最低要求</h3>
+      <ul>
+        <li>继承 <code>Creature</code> 或 <code>EvolvableCreature</code>。</li>
+        <li>构造函数接受 <code>x, y</code>。</li>
+        <li>实现 <code>decide(perception)</code>。</li>
+        <li>导入时不弹交互、不执行实验。</li>
+      </ul>
     </div>
   </div>
-</div>
+  <pre><code>class RuleSurvivor(Creature):
+    def __init__(self, x: float, y: float):
+        super().__init__(x, y, "RuleSurvivor", (255, 128, 0))
 
-<!-- Slide 10: Reproduction -->
-<div class="slide" data-index="9">
-  <h2>&#x1F476; 繁殖机制</h2>
-  <div class="two-col">
-    <div>
-      <h3>繁殖条件</h3>
-      <table>
-        <tr><th>条件</th><th>值</th></tr>
-        <tr><td>能量阈值</td><td>&ge; max_energy &times; 2.0</td></tr>
-        <tr><td>繁殖消耗</td><td>max_energy &times; 0.5</td></tr>
-        <tr><td>冷却时间</td><td>120 帧</td></tr>
-        <tr><td>子代位置</td><td>母体周围随机 20px</td></tr>
-        <tr><td>世界上限</td><td>600 生物</td></tr>
-      </table>
-      <h3>流程</h3>
-      <ol>
-        <li><span class="code-inline">reproduce=True</span></li>
-        <li>检查能量 &ge; max_energy &times; 2</li>
-        <li>检查冷却为 0</li>
-        <li>扣除能量，生成子代</li>
-        <li>进入 120 帧冷却，得 100 分</li>
-      </ol>
+    def decide(self, perception: Perception) -> Action:
+        return Action(perception.self_angle, self.max_speed * 0.5)</code></pre>
+</section>
+
+<section class="slide">
+  <h2>5. API details / API 细节</h2>
+  <div class="grid">
+    <div class="panel">
+      <h3>Perception</h3>
+      <p><code>self_x</code>, <code>self_y</code>, <code>self_angle</code>, <code>self_size</code>, <code>self_energy</code>, <code>self_max_energy</code>, <code>world_width</code>, <code>world_height</code>, <code>nearby_food</code>, <code>nearby_creatures</code>.</p>
     </div>
-    <div>
-      <h3>繁殖策略</h3>
-      <div class="card-grid">
-        <div class="card">
-          <div class="card-title">&#x23F0; 早生策略</div>
-          <div class="card-desc">能量刚到阈值就生，子代小但数量多。</div>
-        </div>
-        <div class="card">
-          <div class="card-title">&#x1F4AA; 晚生策略</div>
-          <div class="card-desc">攒更多能量再生，子代更大更安全。</div>
-        </div>
-        <div class="card">
-          <div class="card-title">&#x1F52D; 时机选择</div>
-          <div class="card-desc">周围没有天敌时繁殖更安全。</div>
-        </div>
-      </div>
-      <div class="tip-box">
-        <p>判断是否可繁殖：<span class="code-inline">perception.self_energy >= perception.self_max_energy * 2.0</span></p>
-      </div>
+    <div class="panel">
+      <h3>Action</h3>
+      <p><code>target_angle</code> and <code>target_speed</code> drive movement. <code>attack_target_id</code> marks intent only. <code>reproduce=True</code> requests reproduction.</p>
+    </div>
+    <div class="panel">
+      <h3>进食规则</h3>
+      <p>大吃小基于碰撞和冷却。只要碰到更小生物并满足冷却，引擎会自动结算。</p>
+    </div>
+    <div class="panel">
+      <h3>属性预算</h3>
+      <p><code>max_speed</code>, <code>max_energy</code>, and <code>vision_radius</code> share a normalized budget capped at <code>1.5</code>.</p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Slide 11: Energy -->
-<div class="slide" data-index="10">
-  <h2>&#x26A1; 能量系统</h2>
-  <p style="margin-bottom:16px;">能量是生存的核心。<span class="highlight">能量降到 0 你就死了。</span></p>
-  <div class="two-col">
-    <div>
-      <h3>能量消耗（每帧）</h3>
-      <table>
-        <tr><th>来源</th><th>公式</th></tr>
-        <tr><td>基础衰减</td><td>0.1 &times; (体型 / 6)</td></tr>
-        <tr><td>移动消耗</td><td>额外 0.08 &times; (速度/max_speed) &times; (体型/6)</td></tr>
-      </table>
-      <div class="tip-box">
-        <p>体型越大，能量消耗越高！没有食物来源时，适当"减肥"可能比维持巨大体型更持久。</p>
-      </div>
+<section class="slide">
+  <h2>6. Training boundaries / 训练边界</h2>
+  <div class="split">
+    <div class="panel">
+      <h3>GA parameter search / GA 参数搜索</h3>
+      <p>Use when behavior is readable and numbers need tuning. Target creatures should inherit <code>EvolvableCreature</code> and define gene ranges.</p>
+      <pre><code>.venv/bin/python train.py \
+  --method ga \
+  --creature creatures/name.py \
+  --generations 20 \
+  --history-output ga_history.json \
+  --output best_params.json</code></pre>
     </div>
-    <div>
-      <h3>能量恢复</h3>
-      <table>
-        <tr><th>来源</th><th>效果</th></tr>
-        <tr><td>&#x1F35E; 吃食物</td><td>+ 食物的 amount（8~100）</td></tr>
-        <tr><td>&#x1F981; 吃掉对手</td><td>+ 对手全部剩余能量</td></tr>
-        <tr><td>&#x1F476; 繁殖</td><td>- max_energy &times; 0.5</td></tr>
-      </table>
-      <h3>吃食物条件</h3>
-      <p>你与食物的距离 &lt; 你的体型 + 3</p>
+    <div class="panel">
+      <h3>Q-learning exploration / Q-learning 探索</h3>
+      <p>Use for high-level action tradeoffs. Current RL trains <code>LearningCreature</code>; it does not rewrite arbitrary creature files.</p>
+      <pre><code>.venv/bin/python train.py \
+  --method rl \
+  --episodes 200 \
+  --output best_policy.json</code></pre>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Slide 12: Opponents -->
-<div class="slide" data-index="11">
-  <h2>&#x1F465; 内置对手分析</h2>
-  <div class="card-grid">
-    <div class="card" style="border-left:4px solid #ff7b72;">
-      <div class="card-title" style="color:#ff7b72;">&#x1F534; Hunter（猎人）</div>
-      <div class="card-desc">
-        速度 2.5 | 能量 80 | 视野 200<br>
-        追猎视野内最弱的生物，低能量时找食物。能量充足时繁殖。<br>
-        <span class="highlight">弱点</span>：初始能量低，前期容易被吃。
-      </div>
-    </div>
-    <div class="card" style="border-left:4px solid #3fb950;">
-      <div class="card-title" style="color:#3fb950;">&#x1F7E2; Grazer（食草者）</div>
-      <div class="card-desc">
-        速度 1.5 | 能量 100 | 视野 150<br>
-        以吃食物为主，敌人接近 35px 时逃跑。能量超 2.5 倍时繁殖。<br>
-        <span class="highlight">弱点</span>：速度最慢，容易被追上。
-      </div>
-    </div>
-    <div class="card" style="border-left:4px solid #58a6ff;">
-      <div class="card-title" style="color:#58a6ff;">&#x1F535; PackHunter（群猎者）</div>
-      <div class="card-desc">
-        速度 2.2 | 能量 80 | 视野 150<br>
-        寻找同伴，聚在一起时围猎。附近同类 &lt;5 且能量充足时繁殖。落单时逃跑。<br>
-        <span class="highlight">弱点</span>：初始能量低，容易被各个击破。
-      </div>
-    </div>
-    <div class="card" style="border-left:4px solid #d29922;">
-      <div class="card-title" style="color:#d29922;">&#x1F7E1; Scavenger（拾荒者）</div>
-      <div class="card-desc">
-        速度 3.5 | 能量 60 | 视野 160<br>
-        全场最快，抢到食物就跑。能量超 3 倍时繁殖。从不主动攻击。<br>
-        <span class="highlight">弱点</span>：初始能量最低，谁都能吃它。
-      </div>
-    </div>
+<section class="slide">
+  <h2>7. Validation discipline / 验证纪律</h2>
+  <div class="grid">
+    <div class="panel"><h3>Import</h3><p>New creature files must import cleanly. 新生物文件必须能干净导入。</p></div>
+    <div class="panel"><h3>Visible smoke</h3><p>Run a short visible simulation when behavior changes. 行为改动后跑一次可视化冒烟。</p></div>
+    <div class="panel"><h3>Focused tests</h3><p>Run subsystem tests before broad regression. 先跑相关子系统测试。</p></div>
+    <div class="panel"><h3>Artifacts</h3><p>Review generated JSON before committing. 提交前检查训练生成 JSON。</p></div>
   </div>
-</div>
+  <pre><code>PYTHONPYCACHEPREFIX=/Users/gaojihe/apps/swarm_arena/.pycache_check \
+  .venv/bin/python -m pytest -q</code></pre>
+</section>
 
-<!-- Slide 13: Route Choice & Snippets -->
-<div class="slide" data-index="12">
-  <h2>&#x1F4A1; 三条技术路线</h2>
-  <div class="card-grid" style="margin-bottom:16px;">
-    <div class="card"><div class="card-title">&#x1F4DD; 规则行为</div><div class="card-desc">适合“看到 X 就做 Y”的想法。把一条自然语言规则翻译进 <span class="code-inline">decide()</span>。</div></div>
-    <div class="card"><div class="card-title">&#x1F9EC; GA 参数优化</div><div class="card-desc">适合调速度、视野、繁殖阈值等数字。目标类需要继承 <span class="code-inline">EvolvableCreature</span>。</div></div>
-    <div class="card"><div class="card-title">&#x1F9E0; Q-learning 策略探索</div><div class="card-desc">适合探索找食物、逃跑、追击、漫步、繁殖等高层动作。当前训练的是 <span class="code-inline">LearningCreature</span>。</div></div>
-    <div class="card"><div class="card-title">&#x1F50D; 验证记录</div><div class="card-desc">每轮记录：现象、假设、本轮改动、验证方式、观察结果、下一轮建议。</div></div>
+<section class="slide">
+  <h2>8. AI-assisted classroom boundary / AI 辅助课堂边界</h2>
+  <div class="flow">
+    <div class="step"><strong>Observe</strong><span>Record one concrete behavior. 记录一个具体现象。</span></div>
+    <div class="step"><strong>Choose</strong><span>Pick rule, GA, or RL. 选择规则、GA 或 RL。</span></div>
+    <div class="step"><strong>Validate</strong><span>Test one focused change. 验证一个聚焦改动。</span></div>
+    <div class="step"><strong>Publish</strong><span>Name, author, route, evidence. 命名、署名、路线和证据。</span></div>
   </div>
-  <h3>常用代码片段</h3>
-  <div class="two-col">
+  <p>This deck is developer-facing; <code>agent.md</code> remains the runtime protocol for AI classroom coaching. 本课件面向开发者；<code>agent.md</code> 仍是 AI 课堂教练运行协议。</p>
+</section>
+
+<section class="slide">
+  <h2>9. GitHub publishing / GitHub 发布</h2>
+  <div class="split">
     <div>
-      <pre><code><span class="cm"># 朝向某点</span>
-<span class="var">angle</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">ty</span>-<span class="var">y</span>, <span class="var">tx</span>-<span class="var">x</span>)
-
-<span class="cm"># 两点距离</span>
-<span class="var">dist</span> = <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">tx</span>-<span class="var">x</span>, <span class="var">ty</span>-<span class="var">y</span>)
-
-<span class="cm"># 逃离敌人</span>
-<span class="var">flee</span> = <span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">y</span>-<span class="var">ey</span>, <span class="var">x</span>-<span class="var">ex</span>)</code></pre>
+      <h3>Branch publish</h3>
+      <pre><code>git status --short --branch
+git add README.md courseware.html
+git commit -m "docs: add bilingual developer materials"
+git push origin HEAD</code></pre>
     </div>
     <div>
-      <pre><code><span class="cm"># 找最近实体</span>
-<span class="var">nearest</span> = <span class="fn">min</span>(<span class="var">list</span>,
-  <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(
-    <span class="var">c</span>.<span class="var">x</span>-<span class="var">x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">y</span>))
-
-<span class="cm"># 随机漫步</span>
-<span class="var">angle</span> = <span class="var">angle</span> + <span class="fn">sin</span>(<span class="var">x</span>*<span class="num">0.01</span>)*<span class="num">0.3</span></code></pre>
+      <h3>PR checklist / PR 检查项</h3>
+      <ul>
+        <li>Scope is limited to docs or named behavior changes.</li>
+        <li>Validation command is included.</li>
+        <li>Generated artifacts are intentional.</li>
+        <li>Unrelated local files are not staged.</li>
+      </ul>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Slide 14: GA Method -->
-<div class="slide" data-index="13">
-  <h2>&#x1F9EC; GA 参数优化怎么讲</h2>
-  <p style="margin-bottom:14px;">GA 像一次“参数选拔赛”：规则已经有了，我们只是让很多组数字上场比较，留下更适合目标的那一组。</p>
-  <div class="method-flow">
-    <div class="flow-node"><strong>1. 多组参数</strong><span>速度、视野、逃跑距离、繁殖阈值各不相同</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>2. 模拟比赛</strong><span>每组参数都放进同一个世界里跑一遍</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>3. 看表现</strong><span>按生存时间、能量、数量或得分比较</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>4. 新一代</strong><span>留下高分参数，组合并做一点随机微调</span></div>
+<section class="slide">
+  <h2>10. Release handoff / 交付说明</h2>
+  <div class="grid">
+    <div class="panel"><h3>What changed</h3><p>README and courseware now speak to maintainers and contributors, not end users.</p></div>
+    <div class="panel"><h3>改动重点</h3><p>README 和课件转为面向维护者/贡献者，而不是面向学生终端用户。</p></div>
+    <div class="panel"><h3>What remains separate</h3><p><code>agent.md</code> keeps the classroom coach behavior contract.</p></div>
+    <div class="panel"><h3>保持分离</h3><p><code>agent.md</code> 继续保存课堂教练行为契约。</p></div>
   </div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">学生要看懂什么</div>
-      <div class="card-desc">不是“机器变聪明了”，而是同一套行为规则换了更合适的数字。训练后要比较旧参数和新参数。</div>
-      <div class="gene-row">
-        <span class="gene-pill">max_speed</span>
-        <span class="gene-pill">vision_radius</span>
-        <span class="gene-pill">flee_distance</span>
-        <span class="gene-pill">reproduce_ratio</span>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">课堂提问</div>
-      <div class="card-desc">“这组参数为什么可能解决刚才的观察？” 例如速度更快是否真的抢到更多食物，繁殖更晚是否真的让后代更安全。</div>
-    </div>
-  </div>
-</div>
+</section>
 
-<!-- Slide 15: Q-learning Method -->
-<div class="slide" data-index="14">
-  <h2>&#x1F9E0; Q-learning 怎么讲</h2>
-  <p style="margin-bottom:14px;">Q-learning 像一本“动作经验表”：生物看到当前状态，试一个动作，拿到反馈，然后把这次经验记下来。</p>
-  <div class="method-flow">
-    <div class="flow-node"><strong>1. 看状态</strong><span>附近有没有食物、威胁、猎物，能量是否充足</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>2. 选动作</strong><span>找食物、逃跑、追击、漫步、繁殖</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>3. 得反馈</strong><span>能量变多、活得更久是好反馈；死亡是坏反馈</span></div>
-    <div class="flow-arrow">&#x2192;</div>
-    <div class="flow-node"><strong>4. 改表格</strong><span>下次遇到类似状态，更倾向高分动作</span></div>
-  </div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">一张简化 Q 表</div>
-      <div class="q-table">
-        <div class="q-cell q-head">状态</div><div class="q-cell q-head">找食物</div><div class="q-cell q-head">逃跑</div><div class="q-cell q-head">追击</div>
-        <div class="q-cell">有大威胁</div><div class="q-cell">0.2</div><div class="q-cell q-best">1.8</div><div class="q-cell">-0.4</div>
-        <div class="q-cell">有小猎物</div><div class="q-cell">0.5</div><div class="q-cell">0.1</div><div class="q-cell q-best">1.3</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">当前项目边界</div>
-      <div class="card-desc"><span class="code-inline">train.py --method rl</span> 训练的是 <span class="code-inline">LearningCreature</span> 的高层策略实验。课堂目标是读出策略倾向，再迁移成学生自己的可读规则。</div>
-    </div>
-  </div>
-</div>
-
-<!-- Slide 16: Rule-Based Example -->
-<div class="slide" data-index="15">
-  <h2>&#x1F4DD; 完整示例 A：规则 Creature</h2>
-  <p style="margin-bottom:14px;">规则路线适合“看到 X 就做 Y”。这个例子直接用 <span class="code-inline">decide()</span> 写出逃跑、追击、找食物、繁殖。</p>
-  <pre><code><span class="kw">class</span> <span class="tp">RuleSurvivor</span>(<span class="tp">Creature</span>):
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>):
-        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"RuleSurvivor"</span>, (<span class="num">255</span>, <span class="num">128</span>, <span class="num">0</span>))
-        <span class="var">self</span>.<span class="var">max_speed</span> = <span class="num">2.2</span>
-        <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">160</span>
-
-    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
-        <span class="kw">if</span> <span class="var">p</span>.<span class="var">self_energy</span> >= <span class="var">p</span>.<span class="var">self_max_energy</span> * <span class="num">2.5</span>:
-            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">p</span>.<span class="var">self_angle</span>, <span class="num">0</span>, <span class="var">reproduce</span>=<span class="kw">True</span>)
-        <span class="var">bigger</span> = [<span class="var">c</span> <span class="kw">for</span> <span class="var">c</span> <span class="kw">in</span> <span class="var">p</span>.<span class="var">nearby_creatures</span> <span class="kw">if</span> <span class="var">c</span>.<span class="var">size</span> > <span class="var">p</span>.<span class="var">self_size</span>]
-        <span class="kw">if</span> <span class="var">bigger</span>:
-            <span class="var">enemy</span> = <span class="fn">min</span>(<span class="var">bigger</span>, <span class="var">key</span>=<span class="kw">lambda</span> <span class="var">c</span>: <span class="var">math</span>.<span class="fn">hypot</span>(<span class="var">c</span>.<span class="var">x</span>-<span class="var">p</span>.<span class="var">self_x</span>, <span class="var">c</span>.<span class="var">y</span>-<span class="var">p</span>.<span class="var">self_y</span>))
-            <span class="kw">return</span> <span class="fn">Action</span>(<span class="var">math</span>.<span class="fn">atan2</span>(<span class="var">p</span>.<span class="var">self_y</span>-<span class="var">enemy</span>.<span class="var">y</span>, <span class="var">p</span>.<span class="var">self_x</span>-<span class="var">enemy</span>.<span class="var">x</span>), <span class="var">self</span>.<span class="var">max_speed</span>)
-        <span class="cm"># 然后追小生物；没目标时找食物或漫步。</span></code></pre>
-  <div class="tip-box"><p>教学重点：先让学生说出规则，再把一条规则翻译成代码。</p></div>
-</div>
-
-<!-- Slide 17: GA Example -->
-<div class="slide" data-index="16">
-  <h2>&#x1F9EC; 完整示例 B：GA Creature</h2>
-  <p style="margin-bottom:14px;">GA 路线要继承 <span class="code-inline">EvolvableCreature</span>。规则仍然可读，GA 只负责搜索数字。</p>
-  <pre><code><span class="kw">class</span> <span class="tp">GeneTunedSurvivor</span>(<span class="tp">EvolvableCreature</span>):
-    <span class="var">gene_defs</span> = {
-        <span class="str">"max_speed"</span>: (<span class="num">1.4</span>, <span class="num">3.2</span>), <span class="str">"vision_radius"</span>: (<span class="num">120</span>, <span class="num">240</span>),
-        <span class="str">"flee_distance"</span>: (<span class="num">35</span>, <span class="num">100</span>), <span class="str">"reproduce_ratio"</span>: (<span class="num">2.0</span>, <span class="num">3.2</span>),
-        <span class="str">"food_speed_ratio"</span>: (<span class="num">0.45</span>, <span class="num">1.0</span>),
-    }
-    <span class="var">default_genes</span> = {
-        <span class="str">"max_speed"</span>: <span class="num">2.2</span>, <span class="str">"vision_radius"</span>: <span class="num">170</span>,
-        <span class="str">"flee_distance"</span>: <span class="num">60</span>, <span class="str">"reproduce_ratio"</span>: <span class="num">2.5</span>,
-        <span class="str">"food_speed_ratio"</span>: <span class="num">0.75</span>,
-    }
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>, <span class="var">genes</span>=<span class="kw">None</span>):
-        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="var">genes</span>=<span class="var">genes</span> <span class="kw">or</span> <span class="var">self</span>.<span class="var">default_genes</span>,
-                         <span class="var">creature_type</span>=<span class="str">"GeneTunedSurvivor"</span>, <span class="var">color</span>=(<span class="num">80</span>, <span class="num">210</span>, <span class="num">255</span>))
-    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
-        <span class="cm"># 使用 self.genes["flee_distance"]、self.genes["reproduce_ratio"] 等数字。</span>
-        <span class="cm"># 训练后把 best_params.json 中认可的值填回 default_genes。</span></code></pre>
-  <div class="tip-box"><p>运行：<span class="code-inline">python3 train.py --method ga --creature creatures/gene_tuned_survivor.py --generations 20</span></p></div>
-</div>
-
-<!-- Slide 18: RL Example -->
-<div class="slide" data-index="17">
-  <h2>&#x1F9E0; 完整示例 C：RL Creature</h2>
-  <p style="margin-bottom:14px;">RL 路线先训练 <span class="code-inline">best_policy.json</span>，再让生物读取 Q 表，根据当前状态选最高分动作。</p>
-  <pre><code><span class="kw">from</span> <span class="tp">training.policy</span> <span class="kw">import</span> <span class="tp">decode_action</span>, <span class="tp">discrete_state_key</span>, <span class="tp">encode_features</span>
-<span class="kw">from</span> <span class="tp">training.rl</span> <span class="kw">import</span> <span class="tp">load_q_policy</span>
-
-<span class="kw">class</span> <span class="tp">PolicyTableSurvivor</span>(<span class="tp">Creature</span>):
-    <span class="var">_policy</span> = <span class="kw">None</span>
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">x</span>, <span class="var">y</span>):
-        <span class="var">super</span>().<span class="fn">__init__</span>(<span class="var">x</span>, <span class="var">y</span>, <span class="str">"PolicyTableSurvivor"</span>, (<span class="num">190</span>, <span class="num">120</span>, <span class="num">255</span>))
-        <span class="var">self</span>.<span class="var">max_speed</span>, <span class="var">self</span>.<span class="var">vision_radius</span> = <span class="num">2.2</span>, <span class="num">180</span>
-        <span class="kw">if</span> <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span> <span class="kw">is</span> <span class="kw">None</span>:
-            <span class="var">root</span> = <span class="var">os</span>.<span class="var">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">dirname</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">abspath</span>(<span class="var">__file__</span>)))
-            <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span> = <span class="fn">load_q_policy</span>(<span class="var">os</span>.<span class="var">path</span>.<span class="fn">join</span>(<span class="var">root</span>, <span class="str">"best_policy.json"</span>))
-    <span class="kw">def</span> <span class="fn">decide</span>(<span class="var">self</span>, <span class="var">p</span>):
-        <span class="var">state</span> = <span class="fn">discrete_state_key</span>(<span class="fn">encode_features</span>(<span class="var">p</span>))
-        <span class="var">action</span> = <span class="tp">PolicyTableSurvivor</span>.<span class="var">_policy</span>.<span class="fn">select_action</span>(<span class="var">state</span>, <span class="var">explore</span>=<span class="kw">False</span>)
-        <span class="kw">return</span> <span class="fn">decode_action</span>(<span class="var">action</span>, <span class="var">p</span>, <span class="var">self</span>)</code></pre>
-  <div class="tip-box"><p>运行：<span class="code-inline">python3 train.py --method rl --episodes 200 --output best_policy.json</span></p></div>
-</div>
-
-<!-- Slide 19: Ending -->
-<div class="slide" data-index="18">
-  <div class="hero-icon">&#x1F3C6;</div>
-  <h1>完成你的实验闭环</h1>
-  <p class="subtitle">观察、选择、验证、署名发布</p>
-  <div class="card-grid" style="max-width:700px; margin: 0 auto;">
-    <div class="card">
-      <div class="card-title">&#x1F50D; 观察现象</div>
-      <div class="card-desc">说清楚你看到了什么、发生在哪里、怎样算改进</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F6E0;&#xFE0F; 选择路线</div>
-      <div class="card-desc">规则行为、GA 参数优化、Q-learning 策略探索三选一</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F4CA; 验证结果</div>
-      <div class="card-desc">用可视化运行、训练输出或前后对比记录证据</div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#x1F4DD; 发布署名</div>
-      <div class="card-desc">写上唯一生物名、作者、路线和一条验证说明</div>
-    </div>
-  </div>
-</div>
-
-</div>
-
-<div class="nav">
-  <button id="prevBtn" onclick="go(-1)">&#x25C0;</button>
-  <span class="page-num" id="pageNum">1 / 19</span>
-  <button id="nextBtn" onclick="go(1)">&#x25B6;</button>
-</div>
-
+</main>
+<nav class="nav">
+  <button type="button" onclick="go(-1)" aria-label="Previous slide">&lt;</button>
+  <span class="page" id="page">1 / 11</span>
+  <button type="button" onclick="go(1)" aria-label="Next slide">&gt;</button>
+</nav>
 <script>
-const slides = document.querySelectorAll('.slide');
-const total = slides.length;
+const slides = Array.from(document.querySelectorAll(".slide"));
+const page = document.getElementById("page");
+const progress = document.getElementById("progress");
 let current = 0;
 
-function show(n) {
-  slides[current].classList.remove('active');
-  current = ((n % total) + total) % total;
-  slides[current].classList.add('active');
-  document.getElementById('pageNum').textContent = (current + 1) + ' / ' + total;
-  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+function show(index) {
+  slides[current].classList.remove("active");
+  current = (index + slides.length) % slides.length;
+  slides[current].classList.add("active");
+  page.textContent = `${current + 1} / ${slides.length}`;
+  progress.style.width = `${((current + 1) / slides.length) * 100}%`;
 }
 
-function go(dir) { show(current + dir); }
+function go(delta) {
+  show(current + delta);
+}
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
-  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-  if (e.key === 'Home') { e.preventDefault(); show(0); }
-  if (e.key === 'End') { e.preventDefault(); show(total - 1); }
-});
-
-let touchStart = 0;
-document.addEventListener('touchstart', function(e) { touchStart = e.touches[0].clientX; });
-document.addEventListener('touchend', function(e) {
-  const diff = e.changedTouches[0].clientX - touchStart;
-  if (Math.abs(diff) > 50) go(diff > 0 ? -1 : 1);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowRight" || event.key === " ") {
+    event.preventDefault();
+    go(1);
+  }
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    go(-1);
+  }
+  if (event.key === "Home") {
+    event.preventDefault();
+    show(0);
+  }
+  if (event.key === "End") {
+    event.preventDefault();
+    show(slides.length - 1);
+  }
 });
 
 show(0);
